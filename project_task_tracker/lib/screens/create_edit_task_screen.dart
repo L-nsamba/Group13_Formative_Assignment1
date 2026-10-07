@@ -9,6 +9,7 @@ class CreateEditTaskScreen extends StatefulWidget {
 
 class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   String? selectedStatus;
+  String? selectedPriority;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,23 +64,44 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 121, 248, 187),
-                        border: Border.all(
-                          color: Colors.greenAccent,
-                          width: 1.5,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedPriority = 'Low';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: selectedPriority == 'Low'
+                              ? const Color.fromARGB(255, 121, 248, 187)
+                              : const Color.fromARGB(255, 220, 250, 232),
+                          border: Border.all(
+                            color: selectedPriority == 'Low'
+                                ? Colors.green
+                                : Colors.greenAccent,
+                            width: selectedPriority == 'Low' ? 2.5 : 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Text(
-                        'Low',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (selectedPriority == 'Low')
+                              const Icon(Icons.check, size: 18),
+                            if (selectedPriority == 'Low')
+                              const SizedBox(width: 4),
+
+                            Text(
+                              'Low',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -87,23 +109,44 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   const SizedBox(width: 8.0),
 
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 241, 241, 103),
-                        border: Border.all(
-                          color: Colors.yellowAccent,
-                          width: 1.5,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedPriority = 'Medium';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: selectedPriority == 'Medium'
+                              ? const Color.fromARGB(255, 241, 241, 103)
+                              : Color.fromARGB(255, 238, 255, 169),
+                          border: Border.all(
+                            color: selectedPriority == 'Medium'
+                                ? Colors.yellow
+                                : Colors.yellowAccent,
+                            width: selectedPriority == 'Medium' ? 2.5 : 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Text(
-                        'Medium',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (selectedPriority == 'Medium')
+                              const Icon(Icons.check, size: 18),
+                            if (selectedPriority == 'Medium')
+                              const SizedBox(width: 4),
+
+                            const Text(
+                              'Medium',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -111,20 +154,44 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   const SizedBox(width: 8.0),
 
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 254, 104, 104),
-                        border: Border.all(color: Colors.redAccent, width: 1.5),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Text(
-                        'High',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedPriority = 'High';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: selectedPriority == 'High'
+                              ? const Color.fromARGB(255, 254, 104, 104)
+                              : const Color.fromARGB(255, 255, 222, 225),
+                          border: Border.all(
+                            color: selectedPriority == 'High'
+                                ? Colors.red
+                                : Colors.redAccent,
+                            width: selectedPriority == 'High' ? 2.5 : 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        textAlign: TextAlign.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (selectedPriority == 'High')
+                              const Icon(Icons.check, size: 18),
+
+                            if (selectedPriority == 'High')
+                              const SizedBox(width: 4),
+                            const Text(
+                              'High',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
