@@ -1,3 +1,6 @@
+import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/models/task.dart';
+
 final List<Member> seedMembers = [
   Member(id: 'm1', name: 'Jean Bosco Mugabo', role: 'Project Manager'),
   Member(id: 'm2', name: 'Aline Uwase', role: 'UI/UX Designer'),
@@ -44,7 +47,7 @@ List<Task> buildSeedTasks() {
       assigneeId: 'm3',
       priority: Priority.medium,
       deadline: now.add(const Duration(days: 3)),
-      status: TaskStatus.inReview,
+      status: TaskStatus.todo,
     ),
     Task(
       id: 't5',
@@ -53,7 +56,7 @@ List<Task> buildSeedTasks() {
       assigneeId: 'm4',
       priority: Priority.low,
       deadline: now.subtract(const Duration(days: 7)),
-      status: TaskStatus.completed,
+      status: TaskStatus.done,
     ),
     Task(
       id: 't6',
@@ -62,7 +65,7 @@ List<Task> buildSeedTasks() {
       assigneeId: 'm3',
       priority: Priority.high,
       deadline: now.add(const Duration(days: 1)),
-      status: TaskStatus.inReview,
+      status: TaskStatus.done,
     ),
     Task(
       id: 't7',
@@ -80,7 +83,7 @@ List<Task> buildSeedTasks() {
       assigneeId: 'm1',
       priority: Priority.medium,
       deadline: now.subtract(const Duration(days: 1)),
-      status: TaskStatus.completed,
+      status: TaskStatus.done,
     ),
   ];
 }

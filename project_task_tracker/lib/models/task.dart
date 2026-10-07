@@ -1,6 +1,6 @@
 enum Priority { low, medium, high }
 
-enum TaskStatus { todo, inProgress, done }
+enum TaskStatus { todo, inProgress, done, notStarted }
 
 // Definition of the params that Task will be able to accept
 class Task { 
