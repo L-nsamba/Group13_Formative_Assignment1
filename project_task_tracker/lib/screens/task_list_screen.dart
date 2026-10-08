@@ -37,7 +37,7 @@ class TaskListScreen extends StatelessWidget {
               radius: 18,
               backgroundColor: const Color(0xFF3B82F6), // Lighter blue accent
               child: const Text(
-                'JD',
+                'JB',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 13,
@@ -48,8 +48,49 @@ class TaskListScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Task List UI coming next...'),
+      body:Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          children:[
+            Expanded(
+              child: Container(
+                height: 46,
+                decoration: BoxDecoration(
+                  color:Colors.white,
+                  border:Border.all(color:const Color(0xFFE2E8F0)),
+                  borderRadius:BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  decoration:InputDecoration(
+                    border: InputBorder.none,
+                    prefixIcon:Icon(Icons.search, color: Color(0xFF94A3B8)),
+                    hintText: "Search tasks....",
+                    hintStyle: TextStyle(color:Color(0xFF94A3B8), fontSize: 14,),
+                    contentPadding: EdgeInsets.symmetric(vertical:12),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 46, 
+              height:46,
+              decoration: BoxDecoration(
+                  color:Colors.white,
+                  border:Border.all(color:const Color(0xFFE2E8F0)),
+                  borderRadius:BorderRadius.circular(10),
+                ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.tune,
+                  color:Color(0xFF475569),
+                  size:20,
+                ),
+                onPressed: ()=>{print("This button is for filtering")}
+                ),
+              ),
+          ],
+        ),
       ),
       // Floating Action Button for task creation
       floatingActionButton: FloatingActionButton(
