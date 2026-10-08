@@ -4,6 +4,7 @@ import 'package:project_task_tracker/screens/main_shell.dart';
 import 'package:project_task_tracker/screens/member_profile_screen.dart';
 import 'package:project_task_tracker/screens/sign_in_screen.dart';
 import 'package:project_task_tracker/screens/task_details_screen.dart';
+import 'package:project_task_tracker/screens/task_list_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +28,7 @@ class _MyAppState extends State<MyApp> {
         '/task-details': (_) => const TaskDetailsScreen(),
         '/create-edit': (_) => const CreateEditTaskScreen(),
         '/member-profile': (_) => const MemberProfileScreen(),
+        '/view-tasks':(_)=> const TaskListScreen()
       },
     );
   }
