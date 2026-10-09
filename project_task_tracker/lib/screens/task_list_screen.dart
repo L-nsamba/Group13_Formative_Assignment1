@@ -16,10 +16,9 @@ class _TaskListScreen extends State<TaskListScreen> {
   String selectedFilter = "All";
   final taskList = buildSeedTasks();
 
+  const TaskListScreen({super.key});
   @override
-  Widget build(BuildContext context) {
-    // Primary dark blue matching your palette
-    const Color darkBlue = Color(0xFF1E4ED8);
+  State<TaskListScreen> createState()=> _TaskListScreen();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC), // Light canvas background
@@ -41,20 +40,20 @@ class _TaskListScreen extends State<TaskListScreen> {
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        // 3. User Avatar
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: const Color(0xFF3B82F6), // Lighter blue accent
-              child: const Text(
-                'JB',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+          // 3. User Avatar
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: const Color(0xFF3B82F6), // Lighter blue accent
+                child: const Text(
+                  'JB',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
