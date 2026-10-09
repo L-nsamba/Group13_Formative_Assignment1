@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_task_tracker/models/member.dart';
+
+import '../widgets/assign_to_widget.dart';
 
 class CreateEditTaskScreen extends StatefulWidget {
   const CreateEditTaskScreen({super.key});
@@ -10,6 +13,7 @@ class CreateEditTaskScreen extends StatefulWidget {
 class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   String? selectedStatus;
   String? selectedPriority;
+  Member? selectedMember;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,7 +244,30 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
               const SizedBox(height: 8.0),
 
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final member = await showDialog<Member?>(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: MemberSelectionCard(
+                          selectedMember: selectedMember,
+                        ),
+                      );
+                    },
+                  );
+
+                  if (!mounted) return;
+
+                  if (member != null) {
+                    setState(() {
+                      selectedMember = member;
+                    });
+                  }
+                },
+
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   alignment: Alignment.centerLeft,
@@ -248,16 +275,33 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(Icons.person, color: Color(0xFF1E4ED8)),
-                    SizedBox(width: 10),
-                    Text(
-                      'Select member',
-                      style: TextStyle(color: Colors.black),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        selectedMember?.name ?? 'Selected member',
+                        style: const TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     Spacer(),
-                    Icon(Icons.keyboard_arrow_down, color: Colors.black),
+                    if (selectedMember != null)
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        tooltip: 'Clear assigned member',
+                        onPressed: () {
+                          setState(() {
+                            selectedMember = null;
+                          });
+                        },
+                      )
+                    else
+                      const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.black,
+                      ),
                   ],
                 ),
               ),
