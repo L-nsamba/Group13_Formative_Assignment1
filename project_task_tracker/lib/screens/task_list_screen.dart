@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project_task_tracker/services/seed_data.dart';
+import 'package:project_task_tracker/models/task.dart';
+import 'package:intl/intl.dart';
 
 class TaskListScreen extends StatefulWidget {
 
   const TaskListScreen({super.key});
-
   @override
   State<TaskListScreen> createState()=> _TaskListScreen();
 
@@ -11,6 +13,8 @@ class TaskListScreen extends StatefulWidget {
   class _TaskListScreen extends State<TaskListScreen>{
     final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
     String selectedFilter = "All";
+    final taskList = buildSeedTasks();
+    
 
     @override
     Widget build(BuildContext context) {
@@ -135,6 +139,67 @@ class TaskListScreen extends StatefulWidget {
                 }).toList(),
               ),
             ),
+            Expanded(child: ListView.builder(
+              itemCount: taskList.length,
+              itemBuilder: (context, index){
+                final task = taskList[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color:const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              task.title,
+                              style:TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold,color: Color(0xFF0F172A)
+                            
+                              ),
+                              ),
+                            
+                          ),
+                          Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),  
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(task.description, style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children:[
+                              CircleAvatar(radius: 12,),
+                              const SizedBox(width: 8),
+                              Text(DateFormat('d mmm yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Color(0xFF64748B)))
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              
+                            ),
+                            child: Text(task.status.name, style: TextStyle(fontWeight: FontWeight.w600),
+
+                            )),  
+                        ]
+                      ),
+                    ],
+                    )
+
+
+                );
+              },
+              )),
           ],
         ),
         // Floating Action Button for task creation
