@@ -13,9 +13,10 @@ class _TeamMembersScreenState extends State<TeamMembersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF1E4ED8),
         title: const Text(
           'Team Members',
-          style: TextStyle(fontWeight: FontWeight.w400),
+          style: TextStyle(color: Colors.white,fontWeight: FontWeight.w400), 
         ),
         centerTitle: true,
         // backgroundColor: Color((0xFF1E4ED8)),

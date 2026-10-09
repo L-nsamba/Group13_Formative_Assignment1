@@ -39,7 +39,7 @@ class _MemberSelectionCardState extends State<MemberSelectionCard> {
       child: SizedBox(
         height:
             MediaQuery.of(context).size.height *
-            0.55, // Controlling how much of the screen the card occupies
+            0.45, // Controlling how much of the screen the card occupies
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -76,7 +76,7 @@ class _MemberSelectionCardState extends State<MemberSelectionCard> {
                       itemCount: filteredMembers.length,
                       itemBuilder: (context, index) {
                         final member = filteredMembers[index];
-              
+
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundColor: const Color(0xFFE3F2FD),
