@@ -48,7 +48,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20.0),
+                const SizedBox(height: 25.0),
 
                 // Description
                 const Text(
@@ -66,7 +66,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25.0),
 
                 // Priority
                 const Text(
@@ -222,7 +222,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25.0),
 
                 // Date Picker
                 const Text(
@@ -289,7 +289,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   ),
                 ],
 
-                SizedBox(height: 20.0),
+                SizedBox(height: 25.0),
                 // Assign To
                 const Text(
                   'Assign To',
@@ -371,11 +371,11 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                   ),
                 ],
 
-                SizedBox(height: 20.0),
+                SizedBox(height: 50.0),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 40,
+                  height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF1E4ED8),

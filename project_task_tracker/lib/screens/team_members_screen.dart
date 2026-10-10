@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
+import 'package:project_task_tracker/utils/form_validation.dart';
 
 class TeamMembersScreen extends StatefulWidget {
   const TeamMembersScreen({super.key});
@@ -11,6 +12,89 @@ class TeamMembersScreen extends StatefulWidget {
 
 class _TeamMembersScreenState extends State<TeamMembersScreen> {
   String searchQuery = '';
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _roleController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _roleController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showAddMemberDialog() async {
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Add Team Member'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name',
+                    hintText: 'Enter member name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: Validators.validateAddMemberName,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _roleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Role',
+                    hintText: 'Enter member role',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: Validators.validateAddMemberRole,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Color(0xFF1E4ED8)),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
+
+                final newMember = Member(
+                  id: DateTime.now().microsecondsSinceEpoch.toString(),
+                  name: _nameController.text.trim(),
+                  role: _roleController.text.trim(),
+                );
+
+                setState(() {
+                  seedMembers.add(newMember);
+                });
+
+                Navigator.pop(dialogContext);
+              },
+              child: const Text(
+                'Add Member',
+                style: TextStyle(color: Color(0xFF1E4ED8)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredMembers = seedMembers.where((member) {
@@ -83,8 +167,9 @@ class _TeamMembersScreenState extends State<TeamMembersScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.add),
+        backgroundColor: const Color.fromRGBO(30, 78, 216, 1),
+        onPressed: _showAddMemberDialog,
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

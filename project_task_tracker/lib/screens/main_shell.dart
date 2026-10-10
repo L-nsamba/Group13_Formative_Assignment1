@@ -26,6 +26,7 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       body: _pages[_index],
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Color(0xFF1E4ED8),
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         type: BottomNavigationBarType.fixed,
