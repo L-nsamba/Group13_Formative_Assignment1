@@ -3,9 +3,11 @@ import 'package:project_task_tracker/services/seed_data.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
 import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/screens/create_edit_task_screen.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   final Task task;
+  
 
   const TaskDetailsScreen({
     super.key,
@@ -18,6 +20,7 @@ class TaskDetailsScreen extends StatefulWidget {
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   late TaskStatus _currentStatus;
+  late Task _activeTask;
   final TextEditingController _notesController = TextEditingController();
 
   // App palette colors
@@ -29,6 +32,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    _activeTask = widget.task;
     _currentStatus = widget.task.status;
   }
 
@@ -127,7 +131,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final assignee = _getAssignee(widget.task.assigneeId);
+    final assignee = _getAssignee(_activeTask.assigneeId);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -137,7 +141,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: textDark, size: 18),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, _activeTask),
         ),
         title: const Text(
           'Task Details',
@@ -206,7 +210,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
             // 3. Task Description
             Text(
-              widget.task.description,
+              _activeTask.description,
               style: const TextStyle(
                 color: Color(0xFF475569),
                 fontSize: 14,
@@ -267,11 +271,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               icon: Icons.flag_outlined,
               label: 'Priority',
               valueWidget: Text(
-                _formatPriority(widget.task.priority),
+                _formatPriority(_activeTask.priority),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: _getPriorityColor(widget.task.priority),
+                  color: _getPriorityColor(_activeTask.priority),
                 ),
               ),
             ),
@@ -329,7 +333,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SLA Status',
+                    'Status',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -353,7 +357,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'The task is progressing as expected.',
+                    'The task is progressing well.',
                     style: TextStyle(
                       fontSize: 13,
                       color: Color(0xFF166534),
@@ -405,8 +409,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {
-                  // Navigation logic will be connected once the edit form is built
+                onPressed: () async{
+                  // 1. Navigate to CreateEditTaskScreen and await the edited task
+                    final updatedTask = await Navigator.push<Task>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateEditTaskScreen(task: _activeTask),
+                      ),
+                    );
+
+                    // 2. If the user saved changes (did not cancel), refresh this screen
+                    if (updatedTask != null) {
+                      setState(() {
+                        _activeTask = updatedTask;
+                        _currentStatus = updatedTask.status;
+                      });
+                    }
+                  
                 },
                 child: const Text(
                   'Edit Task',
