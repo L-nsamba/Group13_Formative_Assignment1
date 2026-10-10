@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
+import 'package:project_task_tracker/models/task.dart';
 
 import '../widgets/assign_to_widget.dart';
 
@@ -12,8 +13,6 @@ class CreateEditTaskScreen extends StatefulWidget {
 }
 
 class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
-  String? selectedStatus;
-  String? statusError;
   String? selectedPriority;
   String? priorityError;
   Member? selectedMember;
@@ -21,6 +20,16 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   DateTime? _selectedDate;
   String? dueDateError;
   final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +50,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                 const SizedBox(height: 8.0),
 
                 TextFormField(
+                  controller: _titleController,
                   validator: Validators.validateTaskTitle,
                   decoration: InputDecoration(
                     hintText: 'Enter Task Name',
@@ -58,6 +68,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                 const SizedBox(height: 8.0),
 
                 TextField(
+                  controller: _descriptionController,
                   minLines: 4,
                   maxLines: 6,
                   decoration: InputDecoration(
@@ -381,35 +392,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                       backgroundColor: Color(0xFF1E4ED8),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {
-                      final isFormValid = _formKey.currentState!.validate();
-
-                      setState(() {
-                        priorityError = selectedPriority == null
-                            ? 'Please select a priority'
-                            : null;
-
-                        dueDateError = _selectedDate == null
-                            ? 'Please select a due data'
-                            : null;
-
-                        assigneeError = selectedMember == null
-                            ? 'Please select a team member'
-                            : null;
-
-                        statusError = selectedStatus == null
-                            ? 'Please select a status'
-                            : null;
-                      });
-
-                      if (!isFormValid ||
-                          selectedPriority == null ||
-                          _selectedDate == null ||
-                          selectedMember == null ||
-                          selectedStatus == null) {
-                        return;
-                      }
-                    },
+                    onPressed: _createTask,
                     child: const Text('Create Task'),
                   ),
                 ),
@@ -419,5 +402,40 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
         ),
       ),
     );
+  }
+
+  void _createTask() {
+    final isFormValid = _formKey.currentState!.validate();
+
+    setState(() {
+      priorityError = selectedPriority == null
+          ? 'Please select a priority'
+          : null;
+
+      dueDateError = _selectedDate == null ? 'Please select a due data' : null;
+
+      assigneeError = selectedMember == null
+          ? 'Please select a team member'
+          : null;
+
+      if (!isFormValid ||
+          selectedPriority == null ||
+          _selectedDate == null ||
+          selectedMember == null) {
+        return;
+      }
+
+      final newTask = Task(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        assigneeId: selectedMember!.id,
+        priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+        deadline: _selectedDate!,
+        status: TaskStatus.todo,
+      );
+
+      Navigator.pop(context, newTask);
+    });
   }
 }
