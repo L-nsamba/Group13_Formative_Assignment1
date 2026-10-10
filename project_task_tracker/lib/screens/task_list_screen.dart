@@ -3,6 +3,7 @@ import 'package:project_task_tracker/services/seed_data.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
 import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/screens/task_details_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
 
@@ -231,7 +232,51 @@ class TaskListScreen extends StatefulWidget {
                               ),
                             
                           ),
-                          Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),  
+                          //Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, color: Color(0xFF64748B), size: 20),
+                            onSelected: (String value) {
+                              if (value == 'edit') {
+                                // Navigate to TaskDetailsScreen, passing this specific task
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TaskDetailsScreen(task: task),
+                                  ),
+                                );
+                              } else if (value == 'delete') {
+                                // Remove task from list and refresh the screen
+                                setState(() {
+                                  taskList.removeWhere((item) => item.id == task.id);
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Task "${task.title}" deleted')),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_outlined, size: 18, color: Color(0xFF1E4ED8)),
+                                    SizedBox(width: 8),
+                                    Text('Edit / Details'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),

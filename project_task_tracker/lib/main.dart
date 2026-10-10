@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         // '/sign-in': (_) => const SignInScreen(),
         '/home': (_) => const MainShell(),
-        '/task-details': (_) => const TaskDetailsScreen(),
+        //'/task-details': (_) => const TaskDetailsScreen(),
         '/create-edit': (_) => const CreateEditTaskScreen(),
         '/member-profile': (_) => const MemberProfileScreen(),
         '/view-tasks':(_)=> const TaskListScreen()
