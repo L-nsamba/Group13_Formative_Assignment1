@@ -7,7 +7,7 @@ class SignInScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sign In')),
-      body: Center(child: const Text('Sign In Screen in progress...'),),
+      body: Center(child: const Text('Sign In Screen Loading...'),),
     );
   }
 }
