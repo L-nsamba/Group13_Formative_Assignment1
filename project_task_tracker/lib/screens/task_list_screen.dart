@@ -17,7 +17,6 @@ class TaskListScreen extends StatefulWidget {
     final List<String> filters = ["All", "In Progress", "Not Started", "To Do"];
     String selectedFilter = "All";
     final taskList = buildSeedTasks();
-
     String _formatStatus(TaskStatus s) {
       final spaced = s.name.replaceAllMapped(
         RegExp(r'([A-Z])'),
@@ -86,13 +85,6 @@ class TaskListScreen extends StatefulWidget {
           backgroundColor: darkBlue,
           elevation: 0,
           centerTitle: true,
-          // I think it is okay if we remove menu icon, I don't see its importance
-          /*leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              // Can open a drawer or show navigation
-            },
-          )*/
           title: const Text(
             'Tasks',
             style: TextStyle(
@@ -241,7 +233,7 @@ class TaskListScreen extends StatefulWidget {
                               ),
                             
                           ),
-                          //Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),
+                          
                           PopupMenuButton<String>(
                             icon: const Icon(Icons.more_vert, color: Color(0xFF64748B), size: 20),
                             onSelected: (String value) async {
@@ -274,25 +266,7 @@ class TaskListScreen extends StatefulWidget {
                                   );
                                 }
                               },
-                            /*onSelected: (String value) {
-                              if (value == 'edit') {
-                                // Navigate to TaskDetailsScreen, passing this specific task
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TaskDetailsScreen(task: task),
-                                  ),
-                                );
-                              } else if (value == 'delete') {
-                                // Remove task from list and refresh the screen
-                                setState(() {
-                                  taskList.removeWhere((item) => item.id == task.id);
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Task "${task.title}" deleted')),
-                                );
-                              }
-                            },*/
+                            
                             itemBuilder: (BuildContext context) => [
                               const PopupMenuItem<String>(
                                 value: 'edit',

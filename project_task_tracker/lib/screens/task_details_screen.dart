@@ -377,7 +377,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 color: textDark,
               ),
             ),
-            const SizedBox(height: 8),
+            /*const SizedBox(height: 8),
             TextField(
               controller: _notesController,
               maxLines: 3,
@@ -394,10 +394,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   borderSide: const BorderSide(color: borderColor),
                 ),
               ),
-            ),
+            ),*/
             const SizedBox(height: 28),
 
-            // 7. Edit Task Button (Visual presentation for now)
+            // 7. Edit Task Button
             SizedBox(
               width: double.infinity,
               height: 48,
