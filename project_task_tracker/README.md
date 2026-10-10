@@ -1,26 +1,17 @@
-# Project & SLA Task Tracker
-A Flutter application for managing project tasks, with automatic
-SLA status (onTrack, atRisk, overDue, completed) based on deadlines
+# project_task_tracker
 
-## Screenshots 
-In Progress......
-
-## Features 
-- Create and edit tasks with titles and descriptions
-- Assign tasks to team members, set priority and deadline
-- Update task status
-- Automatic task updates
-- Dashboard and progress overview
-- Data saved locally and kept after closing the app
-
-## Tech Stack
-- Flutter
-- Dart
-- sqlite local storage
+A new Flutter project.
 
 ## Getting Started
-### 1. Clone the Repository
-```
-    git clone https://github.com/L-nsamba/Group13_Formative_Assignment1.git
-    cd
-```
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
