@@ -117,31 +117,34 @@ class _TaskListScreen extends State<TaskListScreen> {
 
               // Lighter blue accent
             ),
-          ],
-        ),
-        body:Column(
-          
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              
-              child: Row(
-                children:[
-                  Expanded(
-                    child: Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color:Colors.white,
-                        border:Border.all(color:const Color(0xFFE2E8F0)),
-                        borderRadius:BorderRadius.circular(10),
-                      ),
-                      child: TextField(
-                        decoration:InputDecoration(
-                          border: InputBorder.none,
-                          prefixIcon:Icon(Icons.search, color: Color(0xFF94A3B8)),
-                          hintText: "Search tasks....",
-                          hintStyle: TextStyle(color:Color(0xFF94A3B8), fontSize: 14,),
-                          contentPadding: EdgeInsets.symmetric(vertical:12),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Color(0xFF94A3B8),
+                        ),
+                        hintText: "Search tasks....",
+                        hintStyle: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 14,
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
@@ -168,14 +171,13 @@ class _TaskListScreen extends State<TaskListScreen> {
                 ),
               ],
             ),
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [...filters.map((filter) {
-                  final bool isSelected = selectedFilter == filter;
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: filters.map((filter) {
+                final bool isSelected = selectedFilter == filter;
 
                 return GestureDetector(
                   onTap: () {
@@ -277,7 +279,7 @@ class _TaskListScreen extends State<TaskListScreen> {
                                   ),
                                 );
                               }
-                            },*/
+                            },
                             itemBuilder: (BuildContext context) => [
                               const PopupMenuItem<String>(
                                 value: 'edit',
