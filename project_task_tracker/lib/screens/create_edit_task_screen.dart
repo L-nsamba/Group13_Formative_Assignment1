@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
 import 'package:project_task_tracker/models/task.dart';
+import 'package:project_task_tracker/services/seed_data.dart';
+import 'package:project_task_tracker/models/task.dart';
 
 import '../widgets/assign_to_widget.dart';
 
 class CreateEditTaskScreen extends StatefulWidget {
-  const CreateEditTaskScreen({super.key});
+  final Task? task; // Letting the form accept an existing task
+  const CreateEditTaskScreen({super.key, this.task});
 
   @override
   State<CreateEditTaskScreen> createState() => _CreateEditTaskScreenState();
@@ -24,6 +27,28 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   final _descriptionController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    final task = widget.task;
+
+    if (task != null) {
+      _titleController.text = task.title;
+      _descriptionController.text = task.description;
+
+      selectedPriority =
+          task.priority.name[0].toUpperCase() + task.priority.name.substring(1);
+
+      _selectedDate = task.deadline;
+
+      selectedMember = seedMembers.firstWhere(
+        (member) => member.id == task.assigneeId,
+        orElse: () => seedMembers.first,
+      );
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
@@ -33,7 +58,9 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Task')),
+      appBar: AppBar(
+        title: Text(widget.task == null ? 'Create Task' : 'Edit Task'),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -393,7 +420,9 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: _createTask,
-                    child: const Text('Create Task'),
+                    child: Text(
+                      widget.task == null ? 'Create Task' : 'Save Changes',
+                    ),
                   ),
                 ),
               ],
@@ -425,17 +454,27 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
         return;
       }
 
-      final newTask = Task(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        assigneeId: selectedMember!.id,
-        priority: Priority.values.byName(selectedPriority!.toLowerCase()),
-        deadline: _selectedDate!,
-        status: TaskStatus.todo,
-      );
+      final existingTask = widget.task;
 
-      Navigator.pop(context, newTask);
+      final taskToReturn = existingTask == null
+          ? Task(
+              id: DateTime.now().microsecondsSinceEpoch.toString(),
+              title: _titleController.text.trim(),
+              description: _descriptionController.text.trim(),
+              assigneeId: selectedMember!.id,
+              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+              deadline: _selectedDate!,
+              status: TaskStatus.todo,
+            )
+          : existingTask.copyWith(
+              title: _titleController.text.trim(),
+              description: _descriptionController.text.trim(),
+              assigneeId: selectedMember!.id,
+              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+              deadline: _selectedDate!,
+            );
+
+      Navigator.pop(context, taskToReturn);
     });
   }
 }
