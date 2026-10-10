@@ -21,47 +21,27 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
     final member = widget.member ?? routeMember;
 
     final name = member?.name ?? 'Jean Uwimana';
-    final roleOrEmail = member != null ? '${member.role.toLowerCase().replaceAll(' ', '.')}@gmail.com' : 'jean.uwimana@gmail.com';
+    final roleOrEmail = member != null
+        ? '${member.role.toLowerCase().replaceAll(' ', '.')}@gmail.com'
+        : 'jean.uwimana@gmail.com';
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: Navigator.of(context).canPop(),
-        backgroundColor: AppColors.background,
+        backgroundColor: Color(0xFF1E4ED8),
         elevation: 0,
+        centerTitle: true,
         title: const Text(
+          textAlign: TextAlign.center,
           'My profile',
           style: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border, width: 1),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(
-                  Icons.more_horiz,
-                  size: 20,
-                  color: AppColors.textPrimary,
-                ),
-                onPressed: () {
-                  _showOptionsSheet(context);
-                },
-              ),
-            ),
-          ),
-        ],
+        actions: [],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
@@ -69,11 +49,10 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // User Header Card
-            _UserProfileHeaderCard(
-              name: name,
-              email: roleOrEmail,
-              memberSince: 'Member since March 2025',
-            ),
+            // _UserProfileHeaderCard(
+            //   name: name,
+            //   email: roleOrEmail,
+            // ),
 
             const SizedBox(height: 28),
 
@@ -93,83 +72,18 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
 
             // ACCOUNT Section Card
             Container(
+              width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: AppColors.border, width: 1),
+
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _ProfileOptionTile(
-                    icon: Icons.person_outline_rounded,
-                    title: 'Personal information',
-                    onTap: () {},
-                  ),
-                  const _CustomDivider(),
-                  _ProfileOptionTile(
-                    icon: Icons.shield_outlined,
-                    title: 'Password & security',
-                    onTap: () {},
-                  ),
-                  const _CustomDivider(),
-                  _ProfileOptionTile(
-                    icon: Icons.notifications_none_rounded,
-                    title: 'Notifications',
-                    trailingWidget: Switch.adaptive(
-                      value: _notificationsEnabled,
-                      activeTrackColor: AppColors.primary,
-                      onChanged: (val) {
-                        setState(() => _notificationsEnabled = val);
-                      },
-                    ),
-                  ),
-                  const _CustomDivider(),
-                  _ProfileOptionTile(
-                    icon: Icons.wb_sunny_outlined,
-                    title: 'Appearance',
-                    trailingText: 'Light',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // SUPPORT Section Header
-            const Padding(
-              padding: EdgeInsets.only(left: 4.0, bottom: 8.0),
-              child: Text(
-                'SUPPORT',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textMuted,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-
-            // SUPPORT Section Card
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.border, width: 1),
-              ),
-              child: Column(
-                children: [
-                  _ProfileOptionTile(
-                    icon: Icons.help_outline_rounded,
-                    title: 'Help & support',
-                    onTap: () {},
-                  ),
-                  const _CustomDivider(),
-                  _ProfileOptionTile(
-                    icon: Icons.description_outlined,
-                    title: 'Privacy & terms',
-                    onTap: () {},
-                  ),
+                  _ProfileOptionTile(icon: Icons.person_outline_rounded, title: 'Personal information', onTap: () {},)
                 ],
               ),
             ),
@@ -184,7 +98,10 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
                 },
                 borderRadius: BorderRadius.circular(10),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
@@ -215,43 +132,10 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 1),
-          ),
+          border: Border(top: BorderSide(color: AppColors.border, width: 1)),
         ),
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavBarItem(
-              icon: Icons.home_outlined,
-              label: 'Home',
-              isSelected: _navIndex == 0,
-              onTap: () {
-                setState(() => _navIndex = 0);
-                Navigator.of(context).pushReplacementNamed('/home');
-              },
-            ),
-            _NavBarItem(
-              icon: Icons.explore_outlined,
-              label: 'Explore',
-              isSelected: _navIndex == 1,
-              onTap: () => setState(() => _navIndex = 1),
-            ),
-            _NavBarItem(
-              icon: Icons.bookmark_border_rounded,
-              label: 'Saved',
-              isSelected: _navIndex == 2,
-              onTap: () => setState(() => _navIndex = 2),
-            ),
-            _NavBarItem(
-              icon: Icons.person_outline_rounded,
-              label: 'Profile',
-              isSelected: _navIndex == 3,
-              onTap: () => setState(() => _navIndex = 3),
-            ),
-          ],
-        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround),
       ),
     );
   }
@@ -268,18 +152,11 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.share_outlined),
-              title: const Text('Share Profile'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.qr_code_rounded),
-              title: const Text('Show QR Code'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
               leading: const Icon(Icons.logout_rounded, color: Colors.red),
-              title: const Text('Sign out', style: TextStyle(color: Colors.red)),
+              title: const Text(
+                'Sign out',
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(context).pushReplacementNamed('/sign-in');
@@ -296,13 +173,8 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
 class _UserProfileHeaderCard extends StatelessWidget {
   final String name;
   final String email;
-  final String memberSince;
 
-  const _UserProfileHeaderCard({
-    required this.name,
-    required this.email,
-    required this.memberSince,
-  });
+  const _UserProfileHeaderCard({required this.name, required this.email});
 
   @override
   Widget build(BuildContext context) {
@@ -326,12 +198,6 @@ class _UserProfileHeaderCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey.shade300,
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                          'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200',
-                        ),
-                        fit: BoxFit.cover,
-                      ),
                     ),
                   ),
                   Positioned(
@@ -353,7 +219,7 @@ class _UserProfileHeaderCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16),
-              
+
               // Name, Email, Member status
               Expanded(
                 child: Column(
@@ -376,32 +242,27 @@ class _UserProfileHeaderCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      memberSince,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
+                    // Text(
+                    //   style: const TextStyle(
+                    //     fontSize: 12,
+                    //     fontWeight: FontWeight.w600,
+                    //     color: AppColors.primary,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 18),
-          
+
           // Edit Profile Soft Blue Button
           SizedBox(
             width: double.infinity,
             height: 44,
             child: TextButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Edit profile clicked')),
-                );
-              },
+              onPressed: () {},
               style: TextButton.styleFrom(
                 backgroundColor: AppColors.primaryLight,
                 shape: RoundedRectangleBorder(
@@ -420,11 +281,7 @@ class _UserProfileHeaderCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 6),
-                  Icon(
-                    Icons.edit_outlined,
-                    size: 16,
-                    color: AppColors.primary,
-                  ),
+                  Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
                 ],
               ),
             ),
@@ -468,14 +325,10 @@ class _ProfileOptionTile extends StatelessWidget {
                 color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              child: Icon(icon, size: 20, color: AppColors.primary),
             ),
             const SizedBox(width: 14),
-            
+
             // Title
             Expanded(
               child: Text(
@@ -487,7 +340,7 @@ class _ProfileOptionTile extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Trailing Widget / Arrow / Text
             if (trailingWidget != null)
               trailingWidget!
@@ -530,63 +383,7 @@ class _CustomDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.only(left: 66.0, right: 16.0),
-      child: Divider(
-        height: 1,
-        thickness: 1,
-        color: AppColors.border,
-      ),
-    );
-  }
-}
-
-/// Navigation Bar Item
-class _NavBarItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavBarItem({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryLight : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                icon,
-                size: 22,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: Divider(height: 1, thickness: 1, color: AppColors.border),
     );
   }
 }
