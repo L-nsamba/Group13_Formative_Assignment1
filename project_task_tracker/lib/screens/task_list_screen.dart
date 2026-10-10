@@ -14,8 +14,40 @@ class TaskListScreen extends StatefulWidget {
     final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
     String selectedFilter = "All";
     final taskList = buildSeedTasks();
-    
 
+    String _formatStatus(TaskStatus s) {
+      final spaced = s.name.replaceAllMapped(
+        RegExp(r'([A-Z])'),
+        (match) => ' ${match.group(1)}',
+      );
+      return spaced[0].toUpperCase() + spaced.substring(1);
+    }
+    //Color for status
+    Color _getStatusBgColor(TaskStatus status) {
+        switch (status) {
+          case TaskStatus.done:
+            return const Color(0xFFDCFCE7); // Soft light green
+          case TaskStatus.inProgress:
+            return const Color(0xFFE0E7FF); // Soft light blue / indigo
+          case TaskStatus.todo:
+            return const Color(0xFFFEF3C7); // Soft amber / yellow
+          case TaskStatus.notStarted:
+            return const Color(0xFFF1F5F9); // Soft neutral slate gray
+        }
+    }
+    //This method is for text inside the status when background changes
+    Color _getStatusTextColor(TaskStatus status) {
+      switch (status) {
+        case TaskStatus.done:
+          return const Color(0xFF15803D); // Deep green
+        case TaskStatus.inProgress:
+          return const Color(0xFF4338CA); // Deep indigo
+        case TaskStatus.todo:
+          return const Color(0xFFB45309); // Dark amber
+        case TaskStatus.notStarted:
+          return const Color(0xFF475569); // Dark slate gray
+      }
+    }
     @override
     Widget build(BuildContext context) {
       // Primary dark blue matching your palette
@@ -179,20 +211,31 @@ class TaskListScreen extends StatefulWidget {
                             children:[
                               CircleAvatar(radius: 12,),
                               const SizedBox(width: 8),
-                              Text(DateFormat('d mmm yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Color(0xFF64748B)))
+                              Text(DateFormat('d MMM yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Colors.black))
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              
-                            ),
-                            child: Text(task.status.name, style: TextStyle(fontWeight: FontWeight.w600),
-
-                            )),  
                         ]
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getStatusBgColor(task.status),
+                                borderRadius: BorderRadius.circular(12),
+                                
+                              ),
+                              child: Text(_formatStatus(
+                                task.status), 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: _getStatusTextColor(task.status),
+                                  ),
+
+                              )),  
+                      ],)
                     ],
                     )
 
