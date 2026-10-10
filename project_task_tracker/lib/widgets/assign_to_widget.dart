@@ -27,9 +27,9 @@ class _MemberSelectionCardState extends State<MemberSelectionCard> {
       return hasNoUnfinishedTasks;
     }).toList();
 
-    final filteredMembers = availableMembers.where((Member) {
-      final name = Member.name.toLowerCase();
-      final role = Member.role.toLowerCase();
+    final filteredMembers = availableMembers.where((member) {
+      final name = member.name.toLowerCase();
+      final role = member.role.toLowerCase();
       final query = searchQuery.toLowerCase();
 
       return name.contains(query) || role.contains(query);
