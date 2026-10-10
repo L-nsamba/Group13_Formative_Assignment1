@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
+import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/screens/task_details_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
 
@@ -14,8 +16,64 @@ class TaskListScreen extends StatefulWidget {
     final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
     String selectedFilter = "All";
     final taskList = buildSeedTasks();
-    
 
+    String _formatStatus(TaskStatus s) {
+      final spaced = s.name.replaceAllMapped(
+        RegExp(r'([A-Z])'),
+        (match) => ' ${match.group(1)}',
+      );
+      return spaced[0].toUpperCase() + spaced.substring(1);
+    }
+    //Color for status
+    Color _getStatusBgColor(TaskStatus status) {
+        switch (status) {
+          case TaskStatus.done:
+            return const Color(0xFFDCFCE7); // Soft light green
+          case TaskStatus.inProgress:
+            return const Color(0xFFE0E7FF); // Soft light blue / indigo
+          case TaskStatus.todo:
+            return const Color(0xFFFEF3C7); // Soft amber / yellow
+          case TaskStatus.notStarted:
+            return const Color(0xFFF1F5F9); // Soft neutral slate gray
+        }
+    }
+    //This method is for text inside the status when background changes
+    Color _getStatusTextColor(TaskStatus status) {
+      switch (status) {
+        case TaskStatus.done:
+          return const Color(0xFF15803D); // Deep green
+        case TaskStatus.inProgress:
+          return const Color(0xFF4338CA); // Deep indigo
+        case TaskStatus.todo:
+          return const Color(0xFFB45309); // Dark amber
+        case TaskStatus.notStarted:
+          return const Color(0xFF475569); // Dark slate gray
+      }
+    }
+    String _getInitials(String fullName) {
+      
+      final cleaned = fullName.trim();
+      if (cleaned.isEmpty) return '?';
+      final words = cleaned.split(RegExp(r'\s+'));
+      if (words.length == 1) {
+        return words[0][0].toUpperCase();
+      }
+      final firstInitial = words[0][0];
+      final secondInitial = words[1][0];
+
+      return '$firstInitial$secondInitial'.toUpperCase();
+    }
+    Member _getMemberById(String assigneeId) {
+      return seedMembers.firstWhere(
+        (member) => member.id == assigneeId,
+        // Fallback in case an invalid or missing ID is passed
+        orElse: () => Member(
+          id: '',
+          name: 'Unassigned User',
+          role: 'No Role',
+        ),
+      );
+    }
     @override
     Widget build(BuildContext context) {
       // Primary dark blue matching your palette
@@ -48,15 +106,19 @@ class TaskListScreen extends StatefulWidget {
               padding: const EdgeInsets.only(right: 16.0),
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: const Color(0xFF3B82F6), // Lighter blue accent
-                child: const Text(
-                  'JB',
-                  style: TextStyle(
-                    color: Colors.white,
+                backgroundColor: const Color(0xFF3B82F6),
+                child: Text(
+                  _getInitials(seedMembers.first.name),
+                  style: const TextStyle(
+                    color:Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
+
                 ),
+
+                // Lighter blue accent
+                
               ),
             ),
           ],
@@ -142,7 +204,11 @@ class TaskListScreen extends StatefulWidget {
             Expanded(child: ListView.builder(
               itemCount: taskList.length,
               itemBuilder: (context, index){
+                // Inside itemBuilder:
+                
                 final task = taskList[index];
+                final member = _getMemberById(task.assigneeId);
+                final initials = _getInitials(member.name);
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
@@ -166,7 +232,51 @@ class TaskListScreen extends StatefulWidget {
                               ),
                             
                           ),
-                          Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),  
+                          //Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, color: Color(0xFF64748B), size: 20),
+                            onSelected: (String value) {
+                              if (value == 'edit') {
+                                // Navigate to TaskDetailsScreen, passing this specific task
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TaskDetailsScreen(task: task),
+                                  ),
+                                );
+                              } else if (value == 'delete') {
+                                // Remove task from list and refresh the screen
+                                setState(() {
+                                  taskList.removeWhere((item) => item.id == task.id);
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Task "${task.title}" deleted')),
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_outlined, size: 18, color: Color(0xFF1E4ED8)),
+                                    SizedBox(width: 8),
+                                    Text('Edit / Details'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -177,22 +287,46 @@ class TaskListScreen extends StatefulWidget {
                         children: [
                           Row(
                             children:[
-                              CircleAvatar(radius: 12,),
+                              CircleAvatar(
+                                
+                                radius: 12,
+                                backgroundColor: const Color(0xFFE2E8F0),
+                                child: Text(
+                                  initials,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF475569),
+                                  ),
+                                ),
+                                ),
+                                
                               const SizedBox(width: 8),
-                              Text(DateFormat('d mmm yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Color(0xFF64748B)))
+                              Text(DateFormat('d MMM yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Colors.black))
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              
-                            ),
-                            child: Text(task.status.name, style: TextStyle(fontWeight: FontWeight.w600),
-
-                            )),  
                         ]
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getStatusBgColor(task.status),
+                                borderRadius: BorderRadius.circular(12),
+                                
+                              ),
+                              child: Text(_formatStatus(
+                                task.status), 
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: _getStatusTextColor(task.status),
+                                  ),
+
+                              )),  
+                      ],)
                     ],
                     )
 
