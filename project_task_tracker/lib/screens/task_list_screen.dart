@@ -13,7 +13,8 @@ class TaskListScreen extends StatefulWidget {
 
 }
   class _TaskListScreen extends State<TaskListScreen>{
-    final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
+    //I have noticed issue here, the filter section is not scrolling horizontally
+    final List<String> filters = ["All", "In Progress", "Not Started", "To Do"];
     String selectedFilter = "All";
     final taskList = buildSeedTasks();
 
@@ -124,9 +125,11 @@ class TaskListScreen extends StatefulWidget {
           ],
         ),
         body:Column(
+          
           children: [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              
               child: Row(
                 children:[
                   Expanded(
@@ -170,10 +173,12 @@ class TaskListScreen extends StatefulWidget {
               ),
             ),
             SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
-                children: filters.map((filter) {
+                children: [...filters.map((filter) {
                   final bool isSelected = selectedFilter == filter;
 
                   return GestureDetector(
@@ -198,9 +203,13 @@ class TaskListScreen extends StatefulWidget {
                         fontSize: 14),) : Text(filter, style: TextStyle(color: Colors.black)),
                     ),
                   );
-                }).toList(),
-              ),
+                }),
+                const SizedBox(width: 8),
+                ],
+
+              ), 
             ),
+            
             Expanded(child: ListView.builder(
               itemCount: taskList.length,
               itemBuilder: (context, index){
@@ -235,7 +244,37 @@ class TaskListScreen extends StatefulWidget {
                           //Icon(Icons.more_vert, size: 20, color: Color(0xFF64748B),),
                           PopupMenuButton<String>(
                             icon: const Icon(Icons.more_vert, color: Color(0xFF64748B), size: 20),
-                            onSelected: (String value) {
+                            onSelected: (String value) async {
+                                if (value == 'edit') {
+                                  // 2. Await the updated task returned when TaskDetailsScreen pops back
+                                  final updatedTask = await Navigator.push<Task>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TaskDetailsScreen(task: task),
+                                    ),
+                                  );
+
+                                  // 3. If a task was returned, update the list in place
+                                  if (updatedTask != null) {
+                                    setState(() {
+                                      // Find the exact slot where this task lives in taskList
+                                      final index = taskList.indexWhere((item) => item.id == updatedTask.id);
+                                      if (index != -1) {
+                                        taskList[index] = updatedTask; // Replace old task with new one
+                                      }
+                                    });
+                                  }
+                                } else if (value == 'delete') {
+                                  // Remove task from list and refresh the screen
+                                  setState(() {
+                                    taskList.removeWhere((item) => item.id == task.id);
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Task "${task.title}" deleted')),
+                                  );
+                                }
+                              },
+                            /*onSelected: (String value) {
                               if (value == 'edit') {
                                 // Navigate to TaskDetailsScreen, passing this specific task
                                 Navigator.push(
@@ -253,7 +292,7 @@ class TaskListScreen extends StatefulWidget {
                                   SnackBar(content: Text('Task "${task.title}" deleted')),
                                 );
                               }
-                            },
+                            },*/
                             itemBuilder: (BuildContext context) => [
                               const PopupMenuItem<String>(
                                 value: 'edit',

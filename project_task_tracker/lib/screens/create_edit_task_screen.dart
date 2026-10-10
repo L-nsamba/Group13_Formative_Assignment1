@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
+import 'package:project_task_tracker/models/task.dart';
 
 import '../widgets/assign_to_widget.dart';
 
 class CreateEditTaskScreen extends StatefulWidget {
-  const CreateEditTaskScreen({super.key});
+  final Task? task;
+  const CreateEditTaskScreen({
+    super.key,
+    this.task,
+    });
+
 
   @override
   State<CreateEditTaskScreen> createState() => _CreateEditTaskScreenState();
