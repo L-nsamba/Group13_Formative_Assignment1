@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:project_task_tracker/screens/member_profile_screen.dart';
 
 import 'dashboard_screen.dart';
 import 'task_list_screen.dart';
 import 'team_members_screen.dart';
-import 'progress_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -19,7 +19,7 @@ class _MainShellState extends State<MainShell> {
     DashboardScreen(),
     TaskListScreen(),
     TeamMembersScreen(),
-    ProgressScreen(),
+    MemberProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class _MainShellState extends State<MainShell> {
           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.checklist), label: 'Tasks'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Team'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Progress')
+          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Profile')
         ],
       ),
     );
