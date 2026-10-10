@@ -12,6 +12,7 @@ class TaskListScreen extends StatefulWidget {
 }
 
 class _TaskListScreen extends State<TaskListScreen> {
+  //I have noticed issue here, the filter section is not scrolling horizontally
   final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
   String selectedFilter = "All";
   final taskList = buildSeedTasks();
@@ -124,6 +125,7 @@ class _TaskListScreen extends State<TaskListScreen> {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+
             child: Row(
               children: [
                 Expanded(
@@ -173,48 +175,54 @@ class _TaskListScreen extends State<TaskListScreen> {
             ),
           ),
           SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              children: filters.map((filter) {
-                final bool isSelected = selectedFilter == filter;
+              children: [
+                ...filters.map((filter) {
+                  final bool isSelected = selectedFilter == filter;
 
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedFilter = filter;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedFilter = filter;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF1E4ED8)
+                            : Colors.white,
+                        border: isSelected
+                            ? Border.all(color: Color(0xFF1E4ED8))
+                            : Border.all(color: Color(0xFFE2E8F0)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: isSelected
+                          ? Text(
+                              filter,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            )
+                          : Text(filter, style: TextStyle(color: Colors.black)),
                     ),
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFF1E4ED8)
-                          : Colors.white,
-                      border: isSelected
-                          ? Border.all(color: Color(0xFF1E4ED8))
-                          : Border.all(color: Color(0xFFE2E8F0)),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: isSelected
-                        ? Text(
-                            filter,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          )
-                        : Text(filter, style: TextStyle(color: Colors.black)),
-                  ),
-                );
-              }).toList(),
+                  );
+                }),
+                const SizedBox(width: 8),
+              ],
             ),
           ),
+
           Expanded(
             child: ListView.builder(
               itemCount: taskList.length,
@@ -254,16 +262,29 @@ class _TaskListScreen extends State<TaskListScreen> {
                               color: Color(0xFF64748B),
                               size: 20,
                             ),
-                            onSelected: (String value) {
+                            onSelected: (String value) async {
                               if (value == 'edit') {
-                                // Navigate to TaskDetailsScreen, passing this specific task
-                                Navigator.push(
+                                // 2. Await the updated task returned when TaskDetailsScreen pops back
+                                final updatedTask = await Navigator.push<Task>(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         TaskDetailsScreen(task: task),
                                   ),
                                 );
+
+                                // 3. If a task was returned, update the list in place
+                                if (updatedTask != null) {
+                                  setState(() {
+                                    // Find the exact slot where this task lives in taskList
+                                    final index = taskList.indexWhere(
+                                      (item) => item.id == updatedTask.id,
+                                    );
+                                    if (index != -1) {
+                                      taskList[index] = updatedTask; // Replace old task with new one
+                                    }
+                                  });
+                                }
                               } else if (value == 'delete') {
                                 // Remove task from list and refresh the screen
                                 setState(() {
