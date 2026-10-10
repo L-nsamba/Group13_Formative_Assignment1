@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
+import 'package:project_task_tracker/models/member.dart';
 
 class TaskListScreen extends StatefulWidget {
 
@@ -48,6 +49,30 @@ class TaskListScreen extends StatefulWidget {
           return const Color(0xFF475569); // Dark slate gray
       }
     }
+    String _getInitials(String fullName) {
+      
+      final cleaned = fullName.trim();
+      if (cleaned.isEmpty) return '?';
+      final words = cleaned.split(RegExp(r'\s+'));
+      if (words.length == 1) {
+        return words[0][0].toUpperCase();
+      }
+      final firstInitial = words[0][0];
+      final secondInitial = words[1][0];
+
+      return '$firstInitial$secondInitial'.toUpperCase();
+    }
+    Member _getMemberById(String assigneeId) {
+      return seedMembers.firstWhere(
+        (member) => member.id == assigneeId,
+        // Fallback in case an invalid or missing ID is passed
+        orElse: () => Member(
+          id: '',
+          name: 'Unassigned User',
+          role: 'No Role',
+        ),
+      );
+    }
     @override
     Widget build(BuildContext context) {
       // Primary dark blue matching your palette
@@ -80,15 +105,19 @@ class TaskListScreen extends StatefulWidget {
               padding: const EdgeInsets.only(right: 16.0),
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: const Color(0xFF3B82F6), // Lighter blue accent
-                child: const Text(
-                  'JB',
-                  style: TextStyle(
-                    color: Colors.white,
+                backgroundColor: const Color(0xFF3B82F6),
+                child: Text(
+                  _getInitials(seedMembers.first.name),
+                  style: const TextStyle(
+                    color:Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
+
                 ),
+
+                // Lighter blue accent
+                
               ),
             ),
           ],
@@ -174,7 +203,11 @@ class TaskListScreen extends StatefulWidget {
             Expanded(child: ListView.builder(
               itemCount: taskList.length,
               itemBuilder: (context, index){
+                // Inside itemBuilder:
+                
                 final task = taskList[index];
+                final member = _getMemberById(task.assigneeId);
+                final initials = _getInitials(member.name);
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
@@ -209,7 +242,20 @@ class TaskListScreen extends StatefulWidget {
                         children: [
                           Row(
                             children:[
-                              CircleAvatar(radius: 12,),
+                              CircleAvatar(
+                                
+                                radius: 12,
+                                backgroundColor: const Color(0xFFE2E8F0),
+                                child: Text(
+                                  initials,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF475569),
+                                  ),
+                                ),
+                                ),
+                                
                               const SizedBox(width: 8),
                               Text(DateFormat('d MMM yyy').format(task.deadline), style: TextStyle(fontSize: 12, color: Colors.black))
                             ],
