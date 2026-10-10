@@ -21,9 +21,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/home' , //sign-in
+      initialRoute: '/sign-in' , //sign-in
       routes: {
-        // '/sign-in': (_) => const SignInScreen(),
+        '/sign-in': (_) => const SignInScreen(),
         '/home': (_) => const MainShell(),
         //'/task-details': (_) => const TaskDetailsScreen(),
         '/create-edit': (_) => const CreateEditTaskScreen(),
