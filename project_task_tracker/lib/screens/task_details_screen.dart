@@ -287,7 +287,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
 
             // 4. Metadata: Assigned to
             _buildMetadataRow(
@@ -319,7 +319,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 40),
 
             // Metadata: Due Date
             _buildMetadataRow(
@@ -334,7 +334,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 40),
 
             // Metadata: Priority
             _buildMetadataRow(
@@ -349,7 +349,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 40),
 
             // Metadata: Status Dropdown
             _buildMetadataRow(
@@ -388,7 +388,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 50),
 
             // 5. SLA Status Card
             Container(
@@ -410,7 +410,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       color: textDark,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 30),
                   Row(
                     children: [
                       Icon(feedback.icon, color: feedback.accentColor, size: 18),
@@ -425,7 +425,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 12),
                   Text(
                     feedback.message,
                     style: TextStyle(
@@ -436,9 +436,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
 
-            const SizedBox(height: 28),
+            const SizedBox(height: 40),
 
             // 7. Edit Task Button
             SizedBox(
