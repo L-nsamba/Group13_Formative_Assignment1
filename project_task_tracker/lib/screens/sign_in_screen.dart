@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/theme/app_theme.dart';
-import 'package:project_task_tracker/utils/form_validation.dart';
+import 'package:project_task_tracker/services/seed_data.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -11,34 +12,28 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(
-    text: 'name@gmail.com',
-  );
-  final _passwordController = TextEditingController(text: 'password123');
-  bool _obscurePassword = true;
   bool _isLoading = false;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+  Member? _selectedMember;
 
   void _handleSignIn() async {
-    if (_formKey.currentState?.validate() ?? true) {
-      setState(() => _isLoading = true);
-
-      // Simulate network request
-      await Future.delayed(const Duration(milliseconds: 600));
-
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-
-      // Navigate directly to Member Profile screen
-      Navigator.of(context).pushReplacementNamed('/home');
+    if (_selectedMember == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Please select a user')));
+      return;
     }
-  }
+
+    setState(() => _isLoading = true);
+
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    print('Signed in as: ${_selectedMember!.name} (${_selectedMember!.role})');
+
+    Navigator.of(context)
+        .pushReplacementNamed('/home', arguments: _selectedMember);
+  } // <-- close the function here
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +45,6 @@ class _SignInScreenState extends State<SignInScreen> {
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: ConstrainedBox(
-                // Forces the scroll view content to expand to the full height of the screen
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Center(
                   child: Padding(
@@ -58,12 +52,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Form(
                       key: _formKey,
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment
-                            .center, // Vertically centers children
-                        crossAxisAlignment: CrossAxisAlignment
-                            .stretch, // Maintains layout field width
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Main Title & Subtitle
                           Text(
                             'Project & SLA Task Tracker',
                             textAlign: TextAlign.center,
@@ -85,83 +76,41 @@ class _SignInScreenState extends State<SignInScreen> {
                               height: 1.4,
                             ),
                           ),
-
                           const SizedBox(height: 32),
 
-                          // Email Field Label
                           const Text(
-                            'Email address',
+                            'Select User',
                             style: TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 8),
 
-                          // Email TextFormField
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
-                            ),
+                          DropdownButtonFormField<Member>(
+                            value: _selectedMember,
+                            items: seedMembers.map((member) {
+                              return DropdownMenuItem(
+                                value: member,
+                                child: Text('${member.name} - ${member.role}'),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedMember = value;
+                              });
+                            },
                             decoration: const InputDecoration(
-                              hintText: 'Enter your email',
-                              prefixIcon: Icon(Icons.email_outlined, size: 20),
+                              prefixIcon: Icon(Icons.person_outline, size: 20),
+                              hintText: 'Choose a user',
                             ),
-                            validator: Validators.signInEmailValidation,
-                          ),
-
-                          const SizedBox(height: 20),
-
-                          // Password Field Label
-                          const Text(
-                            'Password',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Password TextFormField
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: AppColors.textPrimary,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Enter your password',
-                              prefixIcon: const Icon(
-                                Icons.lock_outline,
-                                size: 20,
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  size: 20,
-                                  color: AppColors.textSecondary,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                            ),
-                            validator: Validators.sigInPasswordValidation,
+                            validator: (value) =>
+                                value == null ? 'Please select a user' : null,
                           ),
 
                           const SizedBox(height: 32),
 
-                          // Sign In Primary Button
                           SizedBox(
                             width: double.infinity,
                             height: 52,
