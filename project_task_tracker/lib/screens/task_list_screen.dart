@@ -17,9 +17,10 @@ class _TaskListScreen extends State<TaskListScreen> {
   String selectedFilter = "All";
   //final taskList = buildSeedTasks();
   late List<Task> taskList;
+  Priority? selectedPriority;
 
   // filtering logic
-  List<Task> get filteredTasks {
+  /*List<Task> get filteredTasks {
       // 1. If "All" is active, return the entire list
       if (selectedFilter == 'All') {
         return taskList;
@@ -40,6 +41,30 @@ class _TaskListScreen extends State<TaskListScreen> {
             return true;
         }
       }).toList();
+  }*/
+  List<Task> get filteredTasks {
+  return taskList.where((task) {
+    // Status Filter (from the horizontal chips)
+    bool matchesStatus = true;
+    if (selectedFilter == 'In Progress') {
+      matchesStatus = task.status == TaskStatus.inProgress;
+    } else if (selectedFilter == 'Not Started') {
+      matchesStatus = task.status == TaskStatus.notStarted;
+    } else if (selectedFilter == 'To Do') {
+      matchesStatus = task.status == TaskStatus.todo;
+    } else if (selectedFilter == 'Done') {
+      matchesStatus = task.status == TaskStatus.done;
+    }
+
+    // Priority Filter (from the Icon.tune button)
+    bool matchesPriority = true;
+    if (selectedPriority != null) {
+      matchesPriority = task.priority == selectedPriority;
+    }
+
+    // Both conditions must be true for the card to display
+    return matchesStatus && matchesPriority;
+  }).toList();
   }
 
   @override
@@ -104,6 +129,93 @@ class _TaskListScreen extends State<TaskListScreen> {
       orElse: () => Member(id: '', name: 'Unassigned User', role: 'No Role'),
     );
   }
+  void _showPriorityFilterSheet() {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Takes only as much vertical height as needed
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row with Title and Reset button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Filter by Priority',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                if (selectedPriority != null)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedPriority = null; // Clear filter
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(color: Color(0xFFEF4444)),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Priority options
+            _buildPriorityTile('All Priorities', null),
+            _buildPriorityTile('High Priority', Priority.high, const Color(0xFFEF4444)),
+            _buildPriorityTile('Medium Priority', Priority.medium, const Color(0xFFF59E0B)),
+            _buildPriorityTile('Low Priority', Priority.low, const Color(0xFF10B981)),
+            const SizedBox(height: 12),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
+  final bool isSelected = selectedPriority == priority;
+
+  return ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: dotColor != null
+        ? Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+          )
+        : const SizedBox(width: 10),
+    title: Text(
+      label,
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        color: isSelected ? const Color(0xFF1E4ED8) : const Color(0xFF0F172A),
+      ),
+    ),
+    trailing: isSelected
+        ? const Icon(Icons.check, color: Color(0xFF1E4ED8), size: 20)
+        : null,
+    onTap: () {
+      setState(() {
+        selectedPriority = priority;
+      });
+      Navigator.pop(context); // Dismiss the sheet
+    },
+  );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,13 +228,6 @@ class _TaskListScreen extends State<TaskListScreen> {
         backgroundColor: darkBlue,
         elevation: 0,
         centerTitle: true,
-        // I think it is okay if we remove menu icon, I don't see its importance
-        /*leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              // Can open a drawer or show navigation
-            },
-          )*/
         title: const Text(
           'Tasks',
           style: TextStyle(
@@ -131,7 +236,7 @@ class _TaskListScreen extends State<TaskListScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        // 3. User Avatar
+        // User Avatar
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -146,8 +251,6 @@ class _TaskListScreen extends State<TaskListScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
-              // Lighter blue accent
             ),
           ),
         ],
@@ -185,21 +288,25 @@ class _TaskListScreen extends State<TaskListScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.tune,
-                      color: Color(0xFF475569),
-                      size: 20,
+                GestureDetector(
+                  onTap: _showPriorityFilterSheet,
+                  child: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: selectedPriority != null ? const Color(0xFF1E4ED8) : Colors.white,
+                      border: Border.all(
+                        color: selectedPriority != null
+                            ? const Color(0xFF1E4ED8)
+                            : const Color(0xFFE2E8F0),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    onPressed: () => {},
+                    child: Icon(
+                        Icons.tune,
+                        color: selectedPriority != null ? Colors.white : const Color(0xFF64748B),
+                        size: 20,
+                      ),
                   ),
                 ),
               ],
