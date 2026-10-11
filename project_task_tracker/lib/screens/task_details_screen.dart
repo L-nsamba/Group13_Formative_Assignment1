@@ -78,7 +78,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
-  // Formating TaskStatus enum values to display in more human readable way
+  // Formating TaskStatus enum values for more readable way
   String _formatStatus(TaskStatus status) {
     switch (status) {
       case TaskStatus.done:
