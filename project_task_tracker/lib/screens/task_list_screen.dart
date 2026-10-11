@@ -21,30 +21,6 @@ class _TaskListScreen extends State<TaskListScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  /*List<Task> get filteredTasks {
-  return taskList.where((task) {
-    // Status Filter (from the horizontal chips)
-    bool matchesStatus = true;
-    if (selectedFilter == 'In Progress') {
-      matchesStatus = task.status == TaskStatus.inProgress;
-    } else if (selectedFilter == 'Not Started') {
-      matchesStatus = task.status == TaskStatus.notStarted;
-    } else if (selectedFilter == 'To Do') {
-      matchesStatus = task.status == TaskStatus.todo;
-    } else if (selectedFilter == 'Done') {
-      matchesStatus = task.status == TaskStatus.done;
-    }
-
-    // Priority Filter (from the Icon.tune button)
-    bool matchesPriority = true;
-    if (selectedPriority != null) {
-      matchesPriority = task.priority == selectedPriority;
-    }
-
-    // Both conditions must be true for the card to display
-    return matchesStatus && matchesPriority;
-  }).toList();
-  }*/
   List<Task> get filteredTasks {
   return taskList.where((task) {
     // Status Filter
