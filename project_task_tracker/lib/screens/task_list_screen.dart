@@ -13,9 +13,40 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreen extends State<TaskListScreen> {
   //I have noticed issue here, the filter section is not scrolling horizontally
-  final List<String> filters = ["All", "On Track", "At Risk", "Overdue"];
+  final List<String> filters = ["All", "In Progress", "To Do", "Done"];
   String selectedFilter = "All";
-  final taskList = buildSeedTasks();
+  //final taskList = buildSeedTasks();
+  late List<Task> taskList;
+
+  // filtering logic
+  List<Task> get filteredTasks {
+      // 1. If "All" is active, return the entire list
+      if (selectedFilter == 'All') {
+        return taskList;
+      }
+
+      // 2. Otherwise, filter items matching the selected TaskStatus
+      return taskList.where((task) {
+        switch (selectedFilter) {
+          case 'In Progress':
+            return task.status == TaskStatus.inProgress;
+          case 'Not Started':
+            return task.status == TaskStatus.notStarted;
+          case 'To Do':
+            return task.status == TaskStatus.todo;
+          case 'Done':
+            return task.status == TaskStatus.done;
+          default:
+            return true;
+        }
+      }).toList();
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    taskList = buildSeedTasks();
+  }
 
   String _formatStatus(TaskStatus s) {
     final spaced = s.name.replaceAllMapped(
@@ -222,14 +253,33 @@ class _TaskListScreen extends State<TaskListScreen> {
               ],
             ),
           ),
-
-          Expanded(
+          SizedBox(height: 16),
+          filteredTasks.isEmpty ?
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 48.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No "$selectedFilter" tasks found',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ):Expanded(
             child: ListView.builder(
-              itemCount: taskList.length,
+              itemCount: filteredTasks.length,
               itemBuilder: (context, index) {
                 // Inside itemBuilder:
 
-                final task = taskList[index];
+                final task = filteredTasks[index];
                 final member = _getMemberById(task.assigneeId);
                 final initials = _getInitials(member.name);
                 return Container(
@@ -405,6 +455,8 @@ class _TaskListScreen extends State<TaskListScreen> {
               },
             ),
           ),
+          
+             
         ],
       ),
       // Floating Action Button for task creation
