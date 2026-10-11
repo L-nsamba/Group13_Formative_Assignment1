@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/services/storage_service.dart';
 import 'package:project_task_tracker/theme/app_theme.dart';
-import 'package:project_task_tracker/services/seed_data.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});

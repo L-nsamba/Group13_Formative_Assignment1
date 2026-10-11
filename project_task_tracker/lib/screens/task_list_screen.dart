@@ -4,6 +4,7 @@ import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:project_task_tracker/screens/task_details_screen.dart';
 import 'package:project_task_tracker/services/storage_service.dart';
+import 'package:project_task_tracker/theme/app_theme.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
@@ -99,45 +100,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  String _formatStatus(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.inProgress:
-        return 'In Progress';
-      case TaskStatus.notStarted:
-        return 'Not Started';
-      case TaskStatus.todo:
-        return 'To Do';
-      case TaskStatus.done:
-        return 'Done';
-    }
-  }
-
-  Color _getStatusBgColor(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return const Color(0xFFDCFCE7);
-      case TaskStatus.inProgress:
-        return const Color(0xFFE0E7FF);
-      case TaskStatus.todo:
-        return const Color(0xFFFEF3C7);
-      case TaskStatus.notStarted:
-        return const Color(0xFFF1F5F9);
-    }
-  }
-
-  Color _getStatusTextColor(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return const Color(0xFF15803D);
-      case TaskStatus.inProgress:
-        return const Color(0xFF4338CA);
-      case TaskStatus.todo:
-        return const Color(0xFFB45309);
-      case TaskStatus.notStarted:
-        return const Color(0xFF475569);
-    }
   }
 
   String _getInitials(String fullName) {
@@ -582,17 +544,17 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: _getStatusBgColor(task.status),
+                                          color: getStatusBgColor(task.status),
                                           borderRadius: BorderRadius.circular(
                                             12,
                                           ),
                                         ),
                                         child: Text(
-                                          _formatStatus(task.status),
+                                          formatStatus(task.status),
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: _getStatusTextColor(
+                                            color: getStatusTextColor(
                                               task.status,
                                             ),
                                           ),

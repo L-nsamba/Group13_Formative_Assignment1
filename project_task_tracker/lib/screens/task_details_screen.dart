@@ -5,27 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/screens/create_edit_task_screen.dart';
 import 'package:project_task_tracker/services/storage_service.dart';
-
-//Helper class for dynamic status display
-class _StatusFeedback {
-  final String label;
-  final String message;
-  final IconData icon;
-  final Color bgColor;
-  final Color borderColor;
-  final Color accentColor;
-  final Color textColor;
-
-  const _StatusFeedback({
-    required this.label,
-    required this.message,
-    required this.icon,
-    required this.bgColor,
-    required this.borderColor,
-    required this.accentColor,
-    required this.textColor,
-  });
-}
+import 'package:project_task_tracker/theme/app_theme.dart';
+import 'package:project_task_tracker/widgets/build_metadata_row.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   final Task task;
@@ -78,125 +59,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
-  // Formating TaskStatus enum values to display in more human readable way
-  String _formatStatus(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return 'Done';
-      case TaskStatus.inProgress:
-        return 'In Progress';
-      case TaskStatus.todo:
-        return 'To Do';
-      case TaskStatus.notStarted:
-        return 'Not Started';
-    }
-  }
-
-  // Background TaskStatus
-  Color _getStatusBgColor(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return const Color(0xFFDCFCE7);
-      case TaskStatus.inProgress:
-        return const Color(0xFFE0E7FF);
-      case TaskStatus.todo:
-        return const Color(0xFFFEF3C7);
-      case TaskStatus.notStarted:
-        return const Color(0xFFF1F5F9);
-    }
-  }
-
-  // color for TaskStatus pill
-  Color _getStatusTextColor(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return const Color(0xFF15803D);
-      case TaskStatus.inProgress:
-        return const Color(0xFF4338CA);
-      case TaskStatus.todo:
-        return const Color(0xFFB45309);
-      case TaskStatus.notStarted:
-        return const Color(0xFF475569);
-    }
-  }
-
-  // Formating Priority values for display
-  String _formatPriority(Priority priority) {
-    switch (priority) {
-      case Priority.high:
-        return 'High';
-      case Priority.medium:
-        return 'Medium';
-      case Priority.low:
-        return 'Low';
-    }
-  }
-
-  // Text color matching Priority level
-  Color _getPriorityColor(Priority priority) {
-    switch (priority) {
-      case Priority.high:
-        return const Color(0xFFEF4444); // Red
-      case Priority.medium:
-        return const Color(0xFFF59E0B); // Amber
-      case Priority.low:
-        return const Color(0xFF10B981); // Emerald green
-    }
-  }
-
-  //A method for dynamic display of status
-  _StatusFeedback _getStatusFeedback(TaskStatus status) {
-    switch (status) {
-      case TaskStatus.done:
-        return const _StatusFeedback(
-          label: 'Completed',
-          message: 'The task has been marked as finished.',
-          icon: Icons.check_circle,
-          bgColor: Color(0xFFF0FDF4), // Soft mint green
-          borderColor: Color(0xFFDCFCE7),
-          accentColor: Color(0xFF16A34A), // Forest green
-          textColor: Color(0xFF166534),
-        );
-
-      case TaskStatus.inProgress:
-        return const _StatusFeedback(
-          label: 'In Progress',
-          message: 'Work is currently ongoing for this task.',
-          icon: Icons.timelapse,
-          bgColor: Color(0xFFEFF6FF), // Soft sky blue
-          borderColor: Color(0xFFDBEAFE),
-          accentColor: Color(0xFF2563EB), // Vibrant blue
-          textColor: Color(0xFF1E40AF),
-        );
-
-      case TaskStatus.todo:
-        return const _StatusFeedback(
-          label: 'To Do',
-          message: 'This task is queued and ready for work.',
-          icon: Icons.assignment_outlined,
-          bgColor: Color(0xFFFEF3C7), // Warm amber
-          borderColor: Color(0xFFFDE68A),
-          accentColor: Color(0xFFD97706), // Deep amber
-          textColor: Color(0xFF92400E),
-        );
-
-      case TaskStatus.notStarted:
-        return const _StatusFeedback(
-          label: 'Not Started',
-          message: 'No work has begun on this task yet.',
-          icon: Icons.pause_circle_outline,
-          bgColor: Color(0xFFF8FAFC), // Slate gray
-          borderColor: Color(0xFFE2E8F0),
-          accentColor: Color(0xFF64748B), // Muted slate
-          textColor: Color(0xFF475569),
-        );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final assignee = _getAssignee(_activeTask.assigneeId);
-    final feedback = _getStatusFeedback(_currentStatus);
+    final feedback = getStatusFeedback(_currentStatus);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -249,13 +115,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusBgColor(_currentStatus),
+                    color: getStatusBgColor(_currentStatus),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    _formatStatus(_currentStatus),
+                    formatStatus(_currentStatus),
                     style: TextStyle(
-                      color: _getStatusTextColor(_currentStatus),
+                      color: getStatusTextColor(_currentStatus),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -288,7 +154,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             const SizedBox(height: 40),
 
             // 4. Metadata: Assigned to
-            _buildMetadataRow(
+            buildMetadataRow(
               icon: Icons.people_outline,
               label: 'Assigned to',
               valueWidget: Row(
@@ -320,7 +186,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             const SizedBox(height: 40),
 
             // Metadata: Due Date
-            _buildMetadataRow(
+            buildMetadataRow(
               icon: Icons.calendar_today_outlined,
               label: 'Due Date',
               valueWidget: Text(
@@ -335,22 +201,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             const SizedBox(height: 40),
 
             // Metadata: Priority
-            _buildMetadataRow(
+            buildMetadataRow(
               icon: Icons.flag_outlined,
               label: 'Priority',
               valueWidget: Text(
-                _formatPriority(_activeTask.priority),
+                formatPriority(_activeTask.priority),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: _getPriorityColor(_activeTask.priority),
+                  color: getPriorityColor(_activeTask.priority),
                 ),
               ),
             ),
             const SizedBox(height: 40),
 
             // Metadata: Status Dropdown
-            _buildMetadataRow(
+            buildMetadataRow(
               icon: Icons.format_list_bulleted,
               label: 'Status',
               valueWidget: Container(
@@ -365,7 +231,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     value: _currentStatus,
                     icon: const Icon(
                       Icons.keyboard_arrow_down,
-                      color: textMuted,
+                      color: Color.fromRGBO(100, 116, 139, 1),
                     ),
                     style: const TextStyle(
                       fontSize: 14,
@@ -401,7 +267,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     items: TaskStatus.values.map((status) {
                       return DropdownMenuItem<TaskStatus>(
                         value: status,
-                        child: Text(_formatStatus(status)),
+                        child: Text(formatStatus(status)),
                       );
                     }).toList(),
                   ),
@@ -505,28 +371,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  // Helper method for aligned metadata rows
-  Widget _buildMetadataRow({
-    required IconData icon,
-    required String label,
-    required Widget valueWidget,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: textMuted),
-        const SizedBox(width: 12),
-        SizedBox(
-          width: 90,
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: textMuted),
-          ),
-        ),
-        Expanded(child: valueWidget),
-      ],
     );
   }
 }

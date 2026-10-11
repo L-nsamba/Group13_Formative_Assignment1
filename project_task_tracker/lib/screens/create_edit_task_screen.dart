@@ -4,7 +4,6 @@ import 'package:project_task_tracker/services/storage_service.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
-import 'package:project_task_tracker/models/task.dart';
 
 import '../widgets/assign_to_widget.dart';
 
