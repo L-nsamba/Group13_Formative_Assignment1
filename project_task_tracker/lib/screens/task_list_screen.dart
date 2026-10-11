@@ -111,7 +111,8 @@ class _TaskListScreen extends State<TaskListScreen> {
     const Color darkBlue = Color(0xFF1E4ED8);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // Light canvas background
+      backgroundColor: const Color(0xFFF8FAFC),
+       // Light canvas background
       appBar: AppBar(
         backgroundColor: darkBlue,
         elevation: 0,
@@ -155,7 +156,7 @@ class _TaskListScreen extends State<TaskListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0,),
 
             child: Row(
               children: [
@@ -274,185 +275,188 @@ class _TaskListScreen extends State<TaskListScreen> {
                   ),
                 ),
               ):Expanded(
-            child: ListView.builder(
-              itemCount: filteredTasks.length,
-              itemBuilder: (context, index) {
-                // Inside itemBuilder:
-
-                final task = filteredTasks[index];
-                final member = _getMemberById(task.assigneeId);
-                final initials = _getInitials(member.name);
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              task.title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF0F172A),
-                              ),
-                            ),
-                          ),
-                          
-                          PopupMenuButton<String>(
-                            icon: const Icon(
-                              Icons.more_vert,
-                              color: Color(0xFF64748B),
-                              size: 20,
-                            ),
-                            onSelected: (String value) async {
-                              if (value == 'edit') {
-                                // 2. Await the updated task returned when TaskDetailsScreen pops back
-                                final updatedTask = await Navigator.push<Task>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        TaskDetailsScreen(task: task),
-                                  ),
-                                );
-
-                                // 3. If a task was returned, update the list in place
-                                if (updatedTask != null) {
-                                  setState(() {
-                                    // Find the exact slot where this task lives in taskList
-                                    final index = taskList.indexWhere(
-                                      (item) => item.id == updatedTask.id,
-                                    );
-                                    if (index != -1) {
-                                      taskList[index] = updatedTask; // Replace old task with new one
-                                    }
-                                  });
-                                }
-                              } else if (value == 'delete') {
-                                // Remove task from list and refresh the screen
-                                setState(() {
-                                  taskList.removeWhere(
-                                    (item) => item.id == task.id,
-                                  );
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Task "${task.title}" deleted',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                            itemBuilder: (BuildContext context) => [
-                              const PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.edit_outlined,
-                                      size: 18,
-                                      color: Color(0xFF1E4ED8),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text('Edit / Details'),
-                                  ],
-                                ),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.delete_outline,
-                                      size: 18,
-                                      color: Colors.red,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Delete',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        task.description,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF64748B),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 12,
-                                backgroundColor: const Color(0xFFE2E8F0),
-                                child: Text(
-                                  initials,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF475569),
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(width: 8),
-                              Text(
-                                DateFormat('d MMM yyy').format(task.deadline),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ListView.builder(
+                itemCount: filteredTasks.length,
+                itemBuilder: (context, index) {
+                  // Inside itemBuilder:
+              
+                  final task = filteredTasks[index];
+                  final member = _getMemberById(task.assigneeId);
+                  final initials = _getInitials(member.name);
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                task.title,
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0F172A),
                                 ),
                               ),
-                            ],
+                            ),
+                            
+                            PopupMenuButton<String>(
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Color(0xFF64748B),
+                                size: 20,
+                              ),
+                              onSelected: (String value) async {
+                                if (value == 'edit') {
+                                  // 2. Await the updated task returned when TaskDetailsScreen pops back
+                                  final updatedTask = await Navigator.push<Task>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TaskDetailsScreen(task: task),
+                                    ),
+                                  );
+              
+                                  // 3. If a task was returned, update the list in place
+                                  if (updatedTask != null) {
+                                    setState(() {
+                                      // Find the exact slot where this task lives in taskList
+                                      final index = taskList.indexWhere(
+                                        (item) => item.id == updatedTask.id,
+                                      );
+                                      if (index != -1) {
+                                        taskList[index] = updatedTask; // Replace old task with new one
+                                      }
+                                    });
+                                  }
+                                } else if (value == 'delete') {
+                                  // Remove task from list and refresh the screen
+                                  setState(() {
+                                    taskList.removeWhere(
+                                      (item) => item.id == task.id,
+                                    );
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Task "${task.title}" deleted',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                const PopupMenuItem<String>(
+                                  value: 'edit',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.edit_outlined,
+                                        size: 18,
+                                        color: Color(0xFF1E4ED8),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Edit / Details'),
+                                    ],
+                                  ),
+                                ),
+                                const PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.delete_outline,
+                                        size: 18,
+                                        color: Colors.red,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          task.description,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF64748B),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: const Color(0xFFE2E8F0),
+                                  child: Text(
+                                    initials,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF475569),
+                                    ),
+                                  ),
+                                ),
+              
+                                const SizedBox(width: 8),
+                                Text(
+                                  DateFormat('d MMM yyy').format(task.deadline),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
-                            decoration: BoxDecoration(
-                              color: _getStatusBgColor(task.status),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              _formatStatus(task.status),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: _getStatusTextColor(task.status),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _getStatusBgColor(task.status),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                _formatStatus(task.status),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: _getStatusTextColor(task.status),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ),
           
