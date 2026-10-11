@@ -23,29 +23,8 @@ class _TaskListScreen extends State<TaskListScreen> {
   
 
 
-  /* filtering logic
-  List<Task> get filteredTasks {
-      // 1. If "All" is active, return the entire list
-      if (selectedFilter == 'All') {
-        return taskList;
-      }
-
-      // 2. Otherwise, filter items matching the selected TaskStatus
-      return taskList.where((task) {
-        switch (selectedFilter) {
-          case 'In Progress':
-            return task.status == TaskStatus.inProgress;
-          case 'Not Started':
-            return task.status == TaskStatus.notStarted;
-          case 'To Do':
-            return task.status == TaskStatus.todo;
-          case 'Done':
-            return task.status == TaskStatus.done;
-          default:
-            return true;
-        }
-      }).toList();
-  }*/
+  
+  
   List<Task> get filteredTasks {
   return taskList.where((task) {
     // 1. Status Filter
@@ -240,12 +219,12 @@ Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
 
   @override
   Widget build(BuildContext context) {
-    // Primary dark blue matching your palette
+    
     const Color darkBlue = Color(0xFF1E4ED8);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-       // Light canvas background
+       
       appBar: AppBar(
         backgroundColor: darkBlue,
         elevation: 0,
