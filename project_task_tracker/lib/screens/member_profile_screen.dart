@@ -80,10 +80,31 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
 
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _ProfileOptionTile(icon: Icons.person_outline_rounded, title: 'Personal information', onTap: () {},)
+                  _ProfileOptionTile(
+                    icon: Icons.person_outline_rounded,
+                    title: 'Personal information',
+                    onTap: () {},
+                  ),
+                  const _CustomDivider(),
+                  _ProfileOptionTile(
+                    icon: Icons.notifications_none_rounded,
+                    title: 'Notifications',
+                    trailingWidget: Switch.adaptive(
+                      value: _notificationsEnabled,
+                      activeTrackColor: AppColors.primary,
+                      onChanged: (val) {
+                        setState(() => _notificationsEnabled = val);
+                      },
+                    ),
+                  ),
+                  const _CustomDivider(),
+                  _ProfileOptionTile(
+                    icon: Icons.wb_sunny_outlined,
+                    title: 'Appearance',
+                    trailingText: 'Light',
+                    onTap: () {},
+                  ),
                 ],
               ),
             ),
