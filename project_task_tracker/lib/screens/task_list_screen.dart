@@ -17,8 +17,13 @@ class _TaskListScreen extends State<TaskListScreen> {
   String selectedFilter = "All";
   //final taskList = buildSeedTasks();
   late List<Task> taskList;
+  Priority? selectedPriority;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  
 
-  // filtering logic
+
+  /* filtering logic
   List<Task> get filteredTasks {
       // 1. If "All" is active, return the entire list
       if (selectedFilter == 'All') {
@@ -40,12 +45,53 @@ class _TaskListScreen extends State<TaskListScreen> {
             return true;
         }
       }).toList();
+  }*/
+  List<Task> get filteredTasks {
+  return taskList.where((task) {
+    // 1. Status Filter
+    bool matchesStatus = true;
+    if (selectedFilter == 'In Progress') {
+      matchesStatus = task.status == TaskStatus.inProgress;
+    } else if (selectedFilter == 'Not Started') {
+      matchesStatus = task.status == TaskStatus.notStarted;
+    } else if (selectedFilter == 'To Do') {
+      matchesStatus = task.status == TaskStatus.todo;
+    } else if (selectedFilter == 'Done') {
+      matchesStatus = task.status == TaskStatus.done;
+    }
+
+    // 2. Priority Filter
+    bool matchesPriority = true;
+    if (selectedPriority != null) {
+      matchesPriority = task.priority == selectedPriority;
+    }
+
+    // 3. Search Query Filter
+    bool matchesSearch = true;
+    if (_searchQuery.trim().isNotEmpty) {
+      final cleanQuery = _searchQuery.trim().toLowerCase();
+      final matchesTitle = task.title.toLowerCase().contains(cleanQuery);
+      final matchesDescription = task.description.toLowerCase().contains(cleanQuery);
+
+      // Matches if the query is found in either the title OR the description
+      matchesSearch = matchesTitle || matchesDescription;
+    }
+
+    // Task must pass all three filters
+    return matchesStatus && matchesPriority && matchesSearch;
+  }).toList();
   }
 
   @override
   void initState(){
     super.initState();
     taskList = buildSeedTasks();
+  }
+  @override
+  void dispose() {
+    // Clean up controller memory when screen is destroyed
+    _searchController.dispose();
+    super.dispose();
   }
 
   String _formatStatus(TaskStatus s) {
@@ -104,6 +150,93 @@ class _TaskListScreen extends State<TaskListScreen> {
       orElse: () => Member(id: '', name: 'Unassigned User', role: 'No Role'),
     );
   }
+  void _showPriorityFilterSheet() {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (BuildContext context) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Takes only as much vertical height as needed
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row with Title and Reset button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Filter by Priority',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A),
+                  ),
+                ),
+                if (selectedPriority != null)
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedPriority = null; // Clear filter
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(color: Color(0xFFEF4444)),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Priority options
+            _buildPriorityTile('All Priorities', null),
+            _buildPriorityTile('High Priority', Priority.high, const Color(0xFFEF4444)),
+            _buildPriorityTile('Medium Priority', Priority.medium, const Color(0xFFF59E0B)),
+            _buildPriorityTile('Low Priority', Priority.low, const Color(0xFF10B981)),
+            const SizedBox(height: 12),
+          ],
+        ),
+      );
+    },
+  );
+  }
+
+Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
+  final bool isSelected = selectedPriority == priority;
+
+  return ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: dotColor != null
+        ? Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+          )
+        : const SizedBox(width: 10),
+    title: Text(
+      label,
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        color: isSelected ? const Color(0xFF1E4ED8) : const Color(0xFF0F172A),
+      ),
+    ),
+    trailing: isSelected
+        ? const Icon(Icons.check, color: Color(0xFF1E4ED8), size: 20)
+        : null,
+    onTap: () {
+      setState(() {
+        selectedPriority = priority;
+      });
+      Navigator.pop(context); // Dismiss the sheet
+    },
+  );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,13 +250,7 @@ class _TaskListScreen extends State<TaskListScreen> {
         backgroundColor: darkBlue,
         elevation: 0,
         centerTitle: true,
-        // I think it is okay if we remove menu icon, I don't see its importance
-        /*leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              // Can open a drawer or show navigation
-            },
-          )*/
+        
         title: const Text(
           'Tasks',
           style: TextStyle(
@@ -132,7 +259,7 @@ class _TaskListScreen extends State<TaskListScreen> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        // 3. User Avatar
+        // User Avatar
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -169,40 +296,61 @@ class _TaskListScreen extends State<TaskListScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: _searchController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
                           Icons.search,
                           color: Color(0xFF94A3B8),
                         ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.close, size: 18, color: Color(0xFF94A3B8)),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
                         hintText: "Search tasks....",
                         hintStyle: TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 14,
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        
                       ),
+                      onChanged: (value) {
+                        // Triggers a rebuild whenever the user types or deletes a character
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+
                     ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.tune,
-                      color: Color(0xFF475569),
-                      size: 20,
+                GestureDetector(
+                    onTap: _showPriorityFilterSheet,
+                    child: Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child:  const Icon(
+                          Icons.tune,
+                          color: Color(0xFF475569),
+                          size: 20,
+                        
+                      ),
                     ),
-                    onPressed: () => {},
                   ),
-                ),
               ],
             ),
           ),
