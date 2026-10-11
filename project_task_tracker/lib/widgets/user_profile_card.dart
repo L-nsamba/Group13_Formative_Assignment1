@@ -37,7 +37,7 @@ class UserProfileHeaderCard extends StatelessWidget {
                     height: 64,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primaryLight,
+                      color: Color.fromARGB(255, 135, 178, 252),
                     ),
                     child: Center(
                       child: Text(
@@ -45,7 +45,7 @@ class UserProfileHeaderCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -107,7 +107,7 @@ class UserProfileHeaderCard extends StatelessWidget {
             child: TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                backgroundColor: AppColors.primaryLight,
+                backgroundColor: Color.fromARGB(255, 135, 178, 252),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -120,11 +120,11 @@ class UserProfileHeaderCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      color: Colors.black,
                     ),
                   ),
                   SizedBox(width: 6),
-                  Icon(Icons.edit_outlined, size: 16, color: AppColors.primary),
+                  Icon(Icons.edit_outlined, size: 16, color: Colors.black),
                 ],
               ),
             ),

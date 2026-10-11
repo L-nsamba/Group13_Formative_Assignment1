@@ -31,10 +31,14 @@ class ProfileOptionTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight,
+                color: Color.fromARGB(255, 135, 178, 252),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, size: 20, color: AppColors.primary),
+              child: Icon(
+                icon,
+                size: 20,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(width: 14),
 
