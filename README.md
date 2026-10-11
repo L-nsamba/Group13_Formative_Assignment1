@@ -8,15 +8,18 @@ SLA status (onTrack, atRisk, overDue, completed) based on deadlines
 - [Demo Video](https://youtu.be/82uSQuYgyIg)
 
 ## Flutter Screens
-<p align="center">
-  <img src="project_task_tracker/screenshots/sign_in_overview.png" height="500">
-  <img src="project_task_tracker/screenshots/task_list.png" height="500">
-  <img src="project_task_tracker/screenshots/task_details_2.png" height="500">
-  <img src="project_task_tracker/screenshots/task_creation_form.png" height="500">
-  <img src="project_task_tracker/screenshots/team_members.png" height="500">
-  <img src="project_task_tracker/screenshots/user_profile.png" height="500">
-  <img src="project_task_tracker/screenshots/user_profile_2.png" height="500">
-</p>
+<table align="center">
+  <tr>
+    <td><img src="project_task_tracker/screenshots/sign_in_overview.png" width="100%"></td>
+    <td><img src="project_task_tracker/screenshots/task_list.png" width="100%"></td>
+    <td><img src="project_task_tracker/screenshots/task_details_2.png" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="project_task_tracker/screenshots/task_creation_form.png" width="100%"></td>
+    <td><img src="project_task_tracker/screenshots/team_members.png" width="100%"></td>
+    <td><img src="project_task_tracker/screenshots/user_profile_2.png" width="100%"></td>
+  </tr>
+</table>
   
 ## Features 
 - Create and edit tasks with titles and descriptions
