@@ -15,7 +15,11 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isLoading = false;
   Member? _selectedMember;
 
-  void _handleSignIn() async {
+  Future<void> _handleSignIn() async {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+
     if (_selectedMember == null) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Please select a user')));
@@ -27,13 +31,17 @@ class _SignInScreenState extends State<SignInScreen> {
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (!mounted) return;
-    setState(() => _isLoading = false);
 
-    print('Signed in as: ${_selectedMember!.name} (${_selectedMember!.role})');
+    setState(() => _isLoading = false);
+    debugPrint(
+      'Signed in as: ${_selectedMember!.name} (${_selectedMember!.role})',
+    );
+
+    if (!mounted) return;
 
     Navigator.of(context)
         .pushReplacementNamed('/home', arguments: _selectedMember);
-  } // <-- close the function here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +64,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Project & SLA Task Tracker',
+                            'Project & SLA Tracker',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 50,
@@ -68,7 +76,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Precision Tracking Crucial Team Deadlines',
+                            'Track priorities, deliverables, and team deadlines.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -89,7 +97,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           const SizedBox(height: 8),
 
                           DropdownButtonFormField<Member>(
-                            value: _selectedMember,
+                            initialValue: _selectedMember,
                             items: seedMembers.map((member) {
                               return DropdownMenuItem(
                                 value: member,
@@ -103,7 +111,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             },
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.person_outline, size: 20),
-                              hintText: 'Choose a user',
+                              hintText: 'Select a team member',
                             ),
                             validator: (value) =>
                                 value == null ? 'Please select a user' : null,
