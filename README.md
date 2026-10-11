@@ -6,6 +6,17 @@ SLA status (onTrack, atRisk, overDue, completed) based on deadlines
 - [Reflection Report](https://docs.google.com/document/d/16SZXBM99MzKARVSuohF_9bIPcBNLQqzOBVJDEWjUG_w/edit?usp=sharing)
 - [Team Task Sheet](https://docs.google.com/spreadsheets/d/1MGXyNmeX4GmhsNvwtdMXV8QuFGlQ-bH6koIeEV8DCEs/edit?usp=sharing) 
 - [Demo Video](https://youtu.be/82uSQuYgyIg)
+
+## Flutter Screens
+<p align="center">
+  <img src="project_task_tracker/screenshots/sign_in_overview.png" height="500">
+  <img src="project_task_tracker/screenshots/task_list.png" height="500">
+  <img src="project_task_tracker/screenshots/task_details_2.png" height="500">
+  <img src="project_task_tracker/screenshots/task_creation_form.png" height="500">
+  <img src="project_task_tracker/screenshots/team_members.png" height="500">
+  <img src="project_task_tracker/screenshots/user_profile.png" height="500">
+  <img src="project_task_tracker/screenshots/user_profile_2.png" height="500">
+</p>
   
 ## Features 
 - Create and edit tasks with titles and descriptions
