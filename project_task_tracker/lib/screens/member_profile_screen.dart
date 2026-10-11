@@ -37,7 +37,7 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
           'My profile',
           style: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),

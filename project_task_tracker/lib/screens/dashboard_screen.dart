@@ -86,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: const Color(0xFF1E4ED8),
         foregroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         title: const Text(
           'Task Overview',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),

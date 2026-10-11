@@ -125,7 +125,7 @@ class _TeamMembersScreenState extends State<TeamMembersScreen> {
         backgroundColor: Color(0xFF1E4ED8),
         title: const Text(
           'Team Members',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         // backgroundColor: Color((0xFF1E4ED8)),
