@@ -2,24 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
 import 'package:project_task_tracker/models/task.dart';
+import 'package:project_task_tracker/services/seed_data.dart';
+import 'package:project_task_tracker/models/task.dart';
 
 import '../widgets/assign_to_widget.dart';
 
 class CreateEditTaskScreen extends StatefulWidget {
-  final Task? task;
-  const CreateEditTaskScreen({
-    super.key,
-    this.task,
-    });
-
+  final Task? task; // Letting the form accept an existing task
+  const CreateEditTaskScreen({super.key, this.task});
 
   @override
   State<CreateEditTaskScreen> createState() => _CreateEditTaskScreenState();
 }
 
 class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
-  String? selectedStatus;
-  String? statusError;
   String? selectedPriority;
   String? priorityError;
   Member? selectedMember;
@@ -27,10 +23,44 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
   DateTime? _selectedDate;
   String? dueDateError;
   final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final task = widget.task;
+
+    if (task != null) {
+      _titleController.text = task.title;
+      _descriptionController.text = task.description;
+
+      selectedPriority =
+          task.priority.name[0].toUpperCase() + task.priority.name.substring(1);
+
+      _selectedDate = task.deadline;
+
+      selectedMember = seedMembers.firstWhere(
+        (member) => member.id == task.assigneeId,
+        orElse: () => seedMembers.first,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Task')),
+      appBar: AppBar(
+        title: Text(widget.task == null ? 'Create Task' : 'Edit Task'),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -47,6 +77,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                 const SizedBox(height: 8.0),
 
                 TextFormField(
+                  controller: _titleController,
                   validator: Validators.validateTaskTitle,
                   decoration: InputDecoration(
                     hintText: 'Enter Task Name',
@@ -64,6 +95,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                 const SizedBox(height: 8.0),
 
                 TextField(
+                  controller: _descriptionController,
                   minLines: 4,
                   maxLines: 6,
                   decoration: InputDecoration(
@@ -387,36 +419,10 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
                       backgroundColor: Color(0xFF1E4ED8),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {
-                      final isFormValid = _formKey.currentState!.validate();
-
-                      setState(() {
-                        priorityError = selectedPriority == null
-                            ? 'Please select a priority'
-                            : null;
-
-                        dueDateError = _selectedDate == null
-                            ? 'Please select a due data'
-                            : null;
-
-                        assigneeError = selectedMember == null
-                            ? 'Please select a team member'
-                            : null;
-
-                        statusError = selectedStatus == null
-                            ? 'Please select a status'
-                            : null;
-                      });
-
-                      if (!isFormValid ||
-                          selectedPriority == null ||
-                          _selectedDate == null ||
-                          selectedMember == null ||
-                          selectedStatus == null) {
-                        return;
-                      }
-                    },
-                    child: const Text('Create Task'),
+                    onPressed: _createTask,
+                    child: Text(
+                      widget.task == null ? 'Create Task' : 'Save Changes',
+                    ),
                   ),
                 ),
               ],
@@ -425,5 +431,50 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
         ),
       ),
     );
+  }
+
+  void _createTask() {
+    final isFormValid = _formKey.currentState!.validate();
+
+    setState(() {
+      priorityError = selectedPriority == null
+          ? 'Please select a priority'
+          : null;
+
+      dueDateError = _selectedDate == null ? 'Please select a due data' : null;
+
+      assigneeError = selectedMember == null
+          ? 'Please select a team member'
+          : null;
+
+      if (!isFormValid ||
+          selectedPriority == null ||
+          _selectedDate == null ||
+          selectedMember == null) {
+        return;
+      }
+
+      final existingTask = widget.task;
+
+      final taskToReturn = existingTask == null
+          ? Task(
+              id: DateTime.now().microsecondsSinceEpoch.toString(),
+              title: _titleController.text.trim(),
+              description: _descriptionController.text.trim(),
+              assigneeId: selectedMember!.id,
+              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+              deadline: _selectedDate!,
+              status: TaskStatus.todo,
+            )
+          : existingTask.copyWith(
+              title: _titleController.text.trim(),
+              description: _descriptionController.text.trim(),
+              assigneeId: selectedMember!.id,
+              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+              deadline: _selectedDate!,
+            );
+
+      Navigator.pop(context, taskToReturn);
+    });
   }
 }
