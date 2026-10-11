@@ -15,34 +15,13 @@ class _TaskListScreen extends State<TaskListScreen> {
   //I have noticed issue here, the filter section is not scrolling horizontally
   final List<String> filters = ["All", "In Progress", "To Do", "Done"];
   String selectedFilter = "All";
-  //final taskList = buildSeedTasks();
+  
   late List<Task> taskList;
   Priority? selectedPriority;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
-  // filtering logic
   /*List<Task> get filteredTasks {
-      // 1. If "All" is active, return the entire list
-      if (selectedFilter == 'All') {
-        return taskList;
-      }
-
-      // 2. Otherwise, filter items matching the selected TaskStatus
-      return taskList.where((task) {
-        switch (selectedFilter) {
-          case 'In Progress':
-            return task.status == TaskStatus.inProgress;
-          case 'Not Started':
-            return task.status == TaskStatus.notStarted;
-          case 'To Do':
-            return task.status == TaskStatus.todo;
-          case 'Done':
-            return task.status == TaskStatus.done;
-          default:
-            return true;
-        }
-      }).toList();
-  }*/
-  List<Task> get filteredTasks {
   return taskList.where((task) {
     // Status Filter (from the horizontal chips)
     bool matchesStatus = true;
@@ -65,12 +44,54 @@ class _TaskListScreen extends State<TaskListScreen> {
     // Both conditions must be true for the card to display
     return matchesStatus && matchesPriority;
   }).toList();
+  }*/
+  List<Task> get filteredTasks {
+  return taskList.where((task) {
+    // Status Filter
+    bool matchesStatus = true;
+    if (selectedFilter == 'In Progress') {
+      matchesStatus = task.status == TaskStatus.inProgress;
+    } else if (selectedFilter == 'Not Started') {
+      matchesStatus = task.status == TaskStatus.notStarted;
+    } else if (selectedFilter == 'To Do') {
+      matchesStatus = task.status == TaskStatus.todo;
+    } else if (selectedFilter == 'Done') {
+      matchesStatus = task.status == TaskStatus.done;
+    }
+
+    // Priority Filter
+    bool matchesPriority = true;
+    if (selectedPriority != null) {
+      matchesPriority = task.priority == selectedPriority;
+    }
+
+    // Search Query Filter
+    bool matchesSearch = true;
+    if (_searchQuery.trim().isNotEmpty) {
+      final cleanQuery = _searchQuery.trim().toLowerCase();
+      final matchesTitle = task.title.toLowerCase().contains(cleanQuery);
+      final matchesDescription = task.description.toLowerCase().contains(cleanQuery);
+
+      // Matches if the query is found in either the title OR the description
+      matchesSearch = matchesTitle || matchesDescription;
+    }
+
+    // passing all three filters
+    return matchesStatus && matchesPriority && matchesSearch;
+  }).toList();
   }
 
   @override
   void initState(){
     super.initState();
     taskList = buildSeedTasks();
+  }
+
+  @override
+  void dispose() {
+    // Clean up controller memory when screen is destroyed
+    _searchController.dispose();
+    super.dispose();
   }
 
   String _formatStatus(TaskStatus s) {
@@ -271,12 +292,25 @@ Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: _searchController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         prefixIcon: Icon(
                           Icons.search,
                           color: Color(0xFF94A3B8),
                         ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.close, size: 18, color: Color(0xFF94A3B8)),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                });
+                              },
+                            )
+                          : null,
+
                         hintText: "Search tasks....",
                         hintStyle: TextStyle(
                           color: Color(0xFF94A3B8),
@@ -284,7 +318,13 @@ Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
-                    ),
+                      onChanged: (value) {
+                          setState(() {
+                            _searchQuery = value;
+                          });
+                        },
+                      
+                                      ),
                   ),
                 ),
                 const SizedBox(width: 10),
