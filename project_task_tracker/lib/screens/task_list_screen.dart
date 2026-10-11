@@ -4,6 +4,7 @@ import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/screens/task_details_screen.dart';
+import 'package:project_task_tracker/services/storage_service.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
@@ -16,55 +17,61 @@ class _TaskListScreen extends State<TaskListScreen> {
   final List<String> filters = ["All", "In Progress", "To Do", "Done"];
   String selectedFilter = "All";
   //final taskList = buildSeedTasks();
-  late List<Task> taskList;
-  Priority? selectedPriority;
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  
+  List<Task> taskList = [];
+  bool isLoading = true;
 
 
   
   
   List<Task> get filteredTasks {
-  return taskList.where((task) {
-    // 1. Status Filter
-    bool matchesStatus = true;
-    if (selectedFilter == 'In Progress') {
-      matchesStatus = task.status == TaskStatus.inProgress;
-    } else if (selectedFilter == 'Not Started') {
-      matchesStatus = task.status == TaskStatus.notStarted;
-    } else if (selectedFilter == 'To Do') {
-      matchesStatus = task.status == TaskStatus.todo;
-    } else if (selectedFilter == 'Done') {
-      matchesStatus = task.status == TaskStatus.done;
+    // 1. If "All" is active, return the entire list
+    if (selectedFilter == 'All') {
+      return taskList;
     }
 
-    // 2. Priority Filter
-    bool matchesPriority = true;
-    if (selectedPriority != null) {
-      matchesPriority = task.priority == selectedPriority;
-    }
-
-    // 3. Search Query Filter
-    bool matchesSearch = true;
-    if (_searchQuery.trim().isNotEmpty) {
-      final cleanQuery = _searchQuery.trim().toLowerCase();
-      final matchesTitle = task.title.toLowerCase().contains(cleanQuery);
-      final matchesDescription = task.description.toLowerCase().contains(cleanQuery);
-
-      // Matches if the query is found in either the title OR the description
-      matchesSearch = matchesTitle || matchesDescription;
-    }
-
-    // Task must pass all three filters
-    return matchesStatus && matchesPriority && matchesSearch;
-  }).toList();
+    // 2. Otherwise, filter items matching the selected TaskStatus
+    return taskList.where((task) {
+      switch (selectedFilter) {
+        case 'In Progress':
+          return task.status == TaskStatus.inProgress;
+        case 'Not Started':
+          return task.status == TaskStatus.notStarted;
+        case 'To Do':
+          return task.status == TaskStatus.todo;
+        case 'Done':
+          return task.status == TaskStatus.done;
+        default:
+          return true;
+      }
+    }).toList();
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    taskList = buildSeedTasks();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    try {
+      final tasks = await DatabaseHelper.instance.getTasks();
+
+      if (!mounted) return;
+
+      setState(() {
+        taskList = tasks;
+        isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Could not load tasks: $e')));
+    }
   }
   @override
   void dispose() {
@@ -224,7 +231,7 @@ Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-       
+      // Light canvas background
       appBar: AppBar(
         backgroundColor: darkBlue,
         elevation: 0,
@@ -259,337 +266,375 @@ Widget _buildPriorityTile(String label, Priority? priority, [Color? dotColor]) {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0,),
-
-            child: Row(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                Expanded(
-                  child: Container(
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Color(0xFF94A3B8),
-                        ),
-                        suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.close, size: 18, color: Color(0xFF94A3B8)),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                            )
-                          : null,
-                        hintText: "Search tasks....",
-                        hintStyle: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(vertical: 12),
-                        
-                      ),
-                      onChanged: (value) {
-                        // Triggers a rebuild whenever the user types or deletes a character
-                        setState(() {
-                          _searchQuery = value;
-                        });
-                      },
-
-                    ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
                   ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                    onTap: _showPriorityFilterSheet,
-                    child: Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child:  const Icon(
-                          Icons.tune,
-                          color: Color(0xFF475569),
-                          size: 20,
-                        
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
 
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                ...filters.map((filter) {
-                  final bool isSelected = selectedFilter == filter;
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = filter;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFF1E4ED8)
-                            : Colors.white,
-                        border: isSelected
-                            ? Border.all(color: Color(0xFF1E4ED8))
-                            : Border.all(color: Color(0xFFE2E8F0)),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: isSelected
-                          ? Text(
-                              filter,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              prefixIcon: Icon(
+                                Icons.search,
+                                color: Color(0xFF94A3B8),
+                              ),
+                              hintText: "Search tasks....",
+                              hintStyle: TextStyle(
+                                color: Color(0xFF94A3B8),
                                 fontSize: 14,
                               ),
-                            )
-                          : Text(filter, style: TextStyle(color: Colors.black)),
-                    ),
-                  );
-                }),
-                const SizedBox(width: 8),
-              ],
-            ),
-          ),
-          SizedBox(height: 16),
-          filteredTasks.isEmpty ?
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 48.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      const Icon(Icons.inbox_outlined, size: 48, color: Color(0xFF94A3B8)),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No "$selectedFilter" tasks found',
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.tune,
+                            color: Color(0xFF475569),
+                            size: 20,
+                          ),
+                          onPressed: () => {},
                         ),
                       ),
                     ],
                   ),
                 ),
-              ):Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ListView.builder(
-                itemCount: filteredTasks.length,
-                itemBuilder: (context, index) {
-                  // Inside itemBuilder:
-              
-                  final task = filteredTasks[index];
-                  final member = _getMemberById(task.assigneeId);
-                  final initials = _getInitials(member.name);
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                task.title,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF0F172A),
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      ...filters.map((filter) {
+                        final bool isSelected = selectedFilter == filter;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedFilter = filter;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFF1E4ED8)
+                                  : Colors.white,
+                              border: isSelected
+                                  ? Border.all(color: Color(0xFF1E4ED8))
+                                  : Border.all(color: Color(0xFFE2E8F0)),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: isSelected
+                                ? Text(
+                                    filter,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  )
+                                : Text(
+                                    filter,
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                          ),
+                        );
+                      }),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                filteredTasks.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 48.0),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.inbox_outlined,
+                                size: 48,
+                                color: Color(0xFF94A3B8),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'No "$selectedFilter" tasks found',
+                                style: const TextStyle(
+                                  color: Color(0xFF64748B),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            ),
-                            
-                            PopupMenuButton<String>(
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: Color(0xFF64748B),
-                                size: 20,
-                              ),
-                              onSelected: (String value) async {
-                                if (value == 'edit') {
-                                  // 2. Await the updated task returned when TaskDetailsScreen pops back
-                                  final updatedTask = await Navigator.push<Task>(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          TaskDetailsScreen(task: task),
-                                    ),
-                                  );
-              
-                                  // 3. If a task was returned, update the list in place
-                                  if (updatedTask != null) {
-                                    setState(() {
-                                      // Find the exact slot where this task lives in taskList
-                                      final index = taskList.indexWhere(
-                                        (item) => item.id == updatedTask.id,
-                                      );
-                                      if (index != -1) {
-                                        taskList[index] = updatedTask; // Replace old task with new one
-                                      }
-                                    });
-                                  }
-                                } else if (value == 'delete') {
-                                  // Remove task from list and refresh the screen
-                                  setState(() {
-                                    taskList.removeWhere(
-                                      (item) => item.id == task.id,
-                                    );
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Task "${task.title}" deleted',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              itemBuilder: (BuildContext context) => [
-                                const PopupMenuItem<String>(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit_outlined,
-                                        size: 18,
-                                        color: Color(0xFF1E4ED8),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text('Edit / Details'),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete_outline,
-                                        size: 18,
-                                        color: Colors.red,
-                                      ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          task.description,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF64748B),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 14),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: const Color(0xFFE2E8F0),
-                                  child: Text(
-                                    initials,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF475569),
+                      )
+                    : Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: ListView.builder(
+                            itemCount: filteredTasks.length,
+                            itemBuilder: (context, index) {
+                              // Inside itemBuilder:
+
+                              final task = filteredTasks[index];
+                              final member = _getMemberById(task.assigneeId);
+                              final initials = _getInitials(member.name);
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFFE2E8F0),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            task.title,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF0F172A),
+                                            ),
+                                          ),
+                                        ),
+
+                                        PopupMenuButton<String>(
+                                          icon: const Icon(
+                                            Icons.more_vert,
+                                            color: Color(0xFF64748B),
+                                            size: 20,
+                                          ),
+                                          onSelected: (String value) async {
+                                            if (value == 'edit') {
+                                              // 2. Await the updated task returned when TaskDetailsScreen pops back
+                                              final updatedTask =
+                                                  await Navigator.push<Task>(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          TaskDetailsScreen(
+                                                            task: task,
+                                                          ),
+                                                    ),
+                                                  );
+
+                                              // 3. If a task was returned, update the list in place
+                                              if (updatedTask != null) {
+                                                setState(() {
+                                                  // Find the exact slot where this task lives in taskList
+                                                  final index = taskList
+                                                      .indexWhere(
+                                                        (item) =>
+                                                            item.id ==
+                                                            updatedTask.id,
+                                                      );
+                                                  if (index != -1) {
+                                                    taskList[index] =
+                                                        updatedTask; // Replace old task with new one
+                                                  }
+                                                });
+                                              }
+                                            } else if (value == 'delete') {
+                                              try {
+                                                await DatabaseHelper.instance
+                                                    .deleteTask(task.id);
+
+                                                if (!mounted) return;
+
+                                                setState(() {
+                                                  taskList.removeWhere(
+                                                    (item) =>
+                                                        item.id == task.id,
+                                                  );
+                                                });
+
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Task "${task.title}" deleted',
+                                                    ),
+                                                  ),
+                                                );
+                                              } catch (e) {
+                                                if (!mounted) return;
+
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Could not delete task: $e',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) =>
+                                              [
+                                                const PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.edit_outlined,
+                                                        size: 18,
+                                                        color: Color(
+                                                          0xFF1E4ED8,
+                                                        ),
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text('Edit / Details'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.delete_outline,
+                                                        size: 18,
+                                                        color: Colors.red,
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        'Delete',
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                        ),
+                                      ],
                                     ),
-                                  ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      task.description,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 12,
+                                              backgroundColor: const Color(
+                                                0xFFE2E8F0,
+                                              ),
+                                              child: Text(
+                                                initials,
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color(0xFF475569),
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              DateFormat('d MMM yyy')
+                                                  .format(task.deadline),
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getStatusBgColor(
+                                              task.status,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            _formatStatus(task.status),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: _getStatusTextColor(
+                                                task.status,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-              
-                                const SizedBox(width: 8),
-                                Text(
-                                  DateFormat('d MMM yyy').format(task.deadline),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                              );
+                            },
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _getStatusBgColor(task.status),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                _formatStatus(task.status),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: _getStatusTextColor(task.status),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+              ],
             ),
-          ),
-          
-             
-        ],
-      ),
       // Floating Action Button for task creation
       floatingActionButton: FloatingActionButton(
         backgroundColor: darkBlue,

@@ -4,6 +4,7 @@ import 'package:project_task_tracker/models/task.dart';
 import 'package:intl/intl.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/screens/create_edit_task_screen.dart';
+import 'package:project_task_tracker/services/storage_service.dart';
 
 //Helper class for dynamic status display
 class _StatusFeedback {
@@ -28,12 +29,8 @@ class _StatusFeedback {
 
 class TaskDetailsScreen extends StatefulWidget {
   final Task task;
-  
 
-  const TaskDetailsScreen({
-    super.key,
-    required this.task,
-  });
+  const TaskDetailsScreen({super.key, required this.task});
 
   @override
   State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
@@ -67,11 +64,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Member _getAssignee(String assigneeId) {
     return seedMembers.firstWhere(
       (member) => member.id == assigneeId,
-      orElse: () => Member(
-        id: '',
-        name: 'Unassigned User',
-        role: 'Team Member',
-      ),
+      orElse: () =>
+          Member(id: '', name: 'Unassigned User', role: 'Team Member'),
     );
   }
 
@@ -98,17 +92,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     }
   }
 
-  // Background TaskStatus 
+  // Background TaskStatus
   Color _getStatusBgColor(TaskStatus status) {
     switch (status) {
       case TaskStatus.done:
-        return const Color(0xFFDCFCE7); 
+        return const Color(0xFFDCFCE7);
       case TaskStatus.inProgress:
         return const Color(0xFFE0E7FF);
       case TaskStatus.todo:
-        return const Color(0xFFFEF3C7); 
+        return const Color(0xFFFEF3C7);
       case TaskStatus.notStarted:
-        return const Color(0xFFF1F5F9); 
+        return const Color(0xFFF1F5F9);
     }
   }
 
@@ -116,13 +110,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Color _getStatusTextColor(TaskStatus status) {
     switch (status) {
       case TaskStatus.done:
-        return const Color(0xFF15803D); 
+        return const Color(0xFF15803D);
       case TaskStatus.inProgress:
-        return const Color(0xFF4338CA); 
+        return const Color(0xFF4338CA);
       case TaskStatus.todo:
-        return const Color(0xFFB45309); 
+        return const Color(0xFFB45309);
       case TaskStatus.notStarted:
-        return const Color(0xFF475569); 
+        return const Color(0xFF475569);
     }
   }
 
@@ -149,53 +143,54 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         return const Color(0xFF10B981); // Emerald green
     }
   }
+
   //A method for dynamic display of status
   _StatusFeedback _getStatusFeedback(TaskStatus status) {
-  switch (status) {
-    case TaskStatus.done:
-      return const _StatusFeedback(
-        label: 'Completed',
-        message: 'The task has been marked as finished.',
-        icon: Icons.check_circle,
-        bgColor: Color(0xFFF0FDF4),      // Soft mint green
-        borderColor: Color(0xFFDCFCE7),
-        accentColor: Color(0xFF16A34A),  // Forest green
-        textColor: Color(0xFF166534),
-      );
+    switch (status) {
+      case TaskStatus.done:
+        return const _StatusFeedback(
+          label: 'Completed',
+          message: 'The task has been marked as finished.',
+          icon: Icons.check_circle,
+          bgColor: Color(0xFFF0FDF4), // Soft mint green
+          borderColor: Color(0xFFDCFCE7),
+          accentColor: Color(0xFF16A34A), // Forest green
+          textColor: Color(0xFF166534),
+        );
 
-    case TaskStatus.inProgress:
-      return const _StatusFeedback(
-        label: 'In Progress',
-        message: 'Work is currently ongoing for this task.',
-        icon: Icons.timelapse,
-        bgColor: Color(0xFFEFF6FF),      // Soft sky blue
-        borderColor: Color(0xFFDBEAFE),
-        accentColor: Color(0xFF2563EB),  // Vibrant blue
-        textColor: Color(0xFF1E40AF),
-      );
+      case TaskStatus.inProgress:
+        return const _StatusFeedback(
+          label: 'In Progress',
+          message: 'Work is currently ongoing for this task.',
+          icon: Icons.timelapse,
+          bgColor: Color(0xFFEFF6FF), // Soft sky blue
+          borderColor: Color(0xFFDBEAFE),
+          accentColor: Color(0xFF2563EB), // Vibrant blue
+          textColor: Color(0xFF1E40AF),
+        );
 
-    case TaskStatus.todo:
-      return const _StatusFeedback(
-        label: 'To Do',
-        message: 'This task is queued and ready for work.',
-        icon: Icons.assignment_outlined,
-        bgColor: Color(0xFFFEF3C7),      // Warm amber
-        borderColor: Color(0xFFFDE68A),
-        accentColor: Color(0xFFD97706),  // Deep amber
-        textColor: Color(0xFF92400E),
-      );
+      case TaskStatus.todo:
+        return const _StatusFeedback(
+          label: 'To Do',
+          message: 'This task is queued and ready for work.',
+          icon: Icons.assignment_outlined,
+          bgColor: Color(0xFFFEF3C7), // Warm amber
+          borderColor: Color(0xFFFDE68A),
+          accentColor: Color(0xFFD97706), // Deep amber
+          textColor: Color(0xFF92400E),
+        );
 
-    case TaskStatus.notStarted:
-      return const _StatusFeedback(
-        label: 'Not Started',
-        message: 'No work has begun on this task yet.',
-        icon: Icons.pause_circle_outline,
-        bgColor: Color(0xFFF8FAFC),      // Slate gray
-        borderColor: Color(0xFFE2E8F0),
-        accentColor: Color(0xFF64748B),  // Muted slate
-        textColor: Color(0xFF475569),
-      );
-  }
+      case TaskStatus.notStarted:
+        return const _StatusFeedback(
+          label: 'Not Started',
+          message: 'No work has begun on this task yet.',
+          icon: Icons.pause_circle_outline,
+          bgColor: Color(0xFFF8FAFC), // Slate gray
+          borderColor: Color(0xFFE2E8F0),
+          accentColor: Color(0xFF64748B), // Muted slate
+          textColor: Color(0xFF475569),
+        );
+    }
   }
 
   @override
@@ -239,7 +234,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    widget.task.title,
+                    _activeTask.title,
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -249,7 +244,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: _getStatusBgColor(_currentStatus),
                     borderRadius: BorderRadius.circular(12),
@@ -326,7 +324,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               icon: Icons.calendar_today_outlined,
               label: 'Due Date',
               valueWidget: Text(
-                DateFormat('d MMM yyyy').format(widget.task.deadline),
+                DateFormat('d MMM yyyy').format(_activeTask.deadline),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -365,17 +363,39 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<TaskStatus>(
                     value: _currentStatus,
-                    icon: const Icon(Icons.keyboard_arrow_down, color: textMuted),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: textMuted,
+                    ),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: textDark,
                     ),
-                    onChanged: (TaskStatus? newStatus) {
-                      if (newStatus != null) {
+                    onChanged: (TaskStatus? newStatus) async {
+                      if (newStatus == null) return;
+
+                      final updatedTask = widget.task.copyWith(
+                        status: newStatus,
+                      );
+
+                      try {
+                        await DatabaseHelper.instance.updateTask(updatedTask);
+
+                        if (!mounted) return;
+
                         setState(() {
                           _currentStatus = newStatus;
+                          _activeTask = updatedTask;
                         });
+                      } catch (e) {
+                        if (!mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Could not update status: $e'),
+                          ),
+                        );
                       }
                     },
                     items: TaskStatus.values.map((status) {
@@ -413,7 +433,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   SizedBox(height: 30),
                   Row(
                     children: [
-                      Icon(feedback.icon, color: feedback.accentColor, size: 18),
+                      Icon(
+                        feedback.icon,
+                        color: feedback.accentColor,
+                        size: 18,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         feedback.label,
@@ -428,10 +452,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   SizedBox(height: 12),
                   Text(
                     feedback.message,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: feedback.textColor,
-                    ),
+                    style: TextStyle(fontSize: 13, color: feedback.textColor),
                   ),
                 ],
               ),
@@ -452,23 +473,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () async{
+                onPressed: () async {
                   // 1. Navigate to CreateEditTaskScreen and await the edited task
-                    final updatedTask = await Navigator.push<Task>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreateEditTaskScreen(task: _activeTask),
-                      ),
-                    );
+                  final updatedTask = await Navigator.push<Task>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CreateEditTaskScreen(task: _activeTask),
+                    ),
+                  );
 
-                    // 2. If the user saved changes (did not cancel), refresh this screen
-                    if (updatedTask != null) {
-                      setState(() {
-                        _activeTask = updatedTask;
-                        _currentStatus = updatedTask.status;
-                      });
-                    }
-                  
+                  // 2. If the user saved changes (did not cancel), refresh this screen
+                  if (updatedTask != null) {
+                    setState(() {
+                      _activeTask = updatedTask;
+                      _currentStatus = updatedTask.status;
+                    });
+                  }
                 },
                 child: const Text(
                   'Edit Task',
@@ -501,10 +522,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           width: 90,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: textMuted,
-            ),
+            style: const TextStyle(fontSize: 14, color: textMuted),
           ),
         ),
         Expanded(child: valueWidget),

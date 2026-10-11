@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/services/storage_service.dart';
 import 'package:project_task_tracker/theme/app_theme.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
 
@@ -12,8 +13,39 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
+  List<Member> members = [];
   Member? _selectedMember;
+
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMembers();
+  }
+
+  Future<void> _loadMembers() async {
+    try {
+      final loadedMembers = await DatabaseHelper.instance.getMembers();
+
+      if (!mounted) return;
+
+      setState(() {
+        members = loadedMembers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not load team members: $e')),
+      );
+    }
+  }
 
   void _handleSignIn() async {
     if (_selectedMember == null) {
@@ -33,7 +65,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     Navigator.of(context)
         .pushReplacementNamed('/home', arguments: _selectedMember);
-  } // <-- close the function here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +122,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                           DropdownButtonFormField<Member>(
                             value: _selectedMember,
-                            items: seedMembers.map((member) {
+                            items: members.map((member) {
                               return DropdownMenuItem(
                                 value: member,
                                 child: Text('${member.name} - ${member.role}'),
