@@ -1,6 +1,19 @@
 // Form validation
 class Validators {
-  // Task Validator
+  static String? signInEmailValidation(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  static String? sigInPasswordValidation(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter a correct password';
+    }
+    return null;
+  }
+
   static String? validateTaskTitle(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter a task title';
