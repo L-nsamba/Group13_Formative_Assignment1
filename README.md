@@ -5,11 +5,8 @@ SLA status (onTrack, atRisk, overDue, completed) based on deadlines
 ## Deliverables 
 - [Reflection Report](https://docs.google.com/document/d/16SZXBM99MzKARVSuohF_9bIPcBNLQqzOBVJDEWjUG_w/edit?usp=sharing)
 - [Team Task Sheet](https://docs.google.com/spreadsheets/d/1MGXyNmeX4GmhsNvwtdMXV8QuFGlQ-bH6koIeEV8DCEs/edit?usp=sharing) 
-- Demo video: In Progress.....
-
-## Screenshots 
-In Progress.....
-
+- [Demo Video](https://youtu.be/82uSQuYgyIg)
+  
 ## Features 
 - Create and edit tasks with titles and descriptions
 - Assign tasks to team members, set priority and deadline
