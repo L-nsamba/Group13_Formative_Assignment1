@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
+import 'package:project_task_tracker/services/storage_service.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
 
 class TeamMembersScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _TeamMembersScreenState extends State<TeamMembersScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (!_formKey.currentState!.validate()) {
                   return;
                 }
@@ -78,11 +79,26 @@ class _TeamMembersScreenState extends State<TeamMembersScreen> {
                   role: _roleController.text.trim(),
                 );
 
-                setState(() {
-                  seedMembers.add(newMember);
-                });
+                try {
+                  await DatabaseHelper.instance.insertMember(newMember);
 
-                Navigator.pop(dialogContext);
+                  if (!mounted) return;
+
+                  setState(() {
+                    seedMembers.add(newMember);
+                  });
+
+                  _nameController.clear();
+                  _roleController.clear();
+
+                  Navigator.pop(dialogContext);
+                } catch (e) {
+                  if (!dialogContext.mounted) return;
+
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text('Could not add team member: $e')),
+                  );
+                }
               },
               child: const Text(
                 'Add Member',
