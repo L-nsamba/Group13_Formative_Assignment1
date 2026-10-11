@@ -104,8 +104,7 @@ class DatabaseHelper {
   Future<List<Task>> getTasks() async {
     final db = await database;
 
-    final result = await db.query('tasks');
-
+    final result = await db.query('tasks', orderBy: 'CAST(id AS INTEGER) DESC');
     return result.map((map) => Task.fromMap(map)).toList();
   }
 

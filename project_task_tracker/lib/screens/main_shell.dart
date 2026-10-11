@@ -21,6 +21,15 @@ class _MainShellState extends State<MainShell> {
     TeamMembersScreen(),
     MemberProfileScreen(),
   ];
+
+  void _onTabSelected(int index) {
+    setState(() {
+      _index = index;
+    });
+
+    if (index == 1) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,13 +37,16 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Color(0xFF1E4ED8),
         currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
+        onTap: _onTabSelected,
         type: BottomNavigationBarType.fixed,
-        items: const[
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.checklist), label: 'Tasks'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Team'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Profile')
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+          ),
         ],
       ),
     );
