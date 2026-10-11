@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_task_tracker/models/member.dart';
+import 'package:project_task_tracker/services/storage_service.dart';
 import 'package:project_task_tracker/utils/form_validation.dart';
 import 'package:project_task_tracker/models/task.dart';
 import 'package:project_task_tracker/services/seed_data.dart';
@@ -433,7 +434,7 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
     );
   }
 
-  void _createTask() {
+  void _createTask() async {
     final isFormValid = _formKey.currentState!.validate();
 
     setState(() {
@@ -446,35 +447,50 @@ class _CreateEditTaskScreenState extends State<CreateEditTaskScreen> {
       assigneeError = selectedMember == null
           ? 'Please select a team member'
           : null;
+    });
 
-      if (!isFormValid ||
-          selectedPriority == null ||
-          _selectedDate == null ||
-          selectedMember == null) {
-        return;
+    if (!isFormValid ||
+        selectedPriority == null ||
+        _selectedDate == null ||
+        selectedMember == null) {
+      return;
+    }
+
+    final existingTask = widget.task;
+
+    final taskToSave = existingTask == null
+        ? Task(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            title: _titleController.text.trim(),
+            description: _descriptionController.text.trim(),
+            assigneeId: selectedMember!.id,
+            priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+            deadline: _selectedDate!,
+            status: TaskStatus.todo,
+          )
+        : existingTask.copyWith(
+            title: _titleController.text.trim(),
+            description: _descriptionController.text.trim(),
+            assigneeId: selectedMember!.id,
+            priority: Priority.values.byName(selectedPriority!.toLowerCase()),
+            deadline: _selectedDate!,
+          );
+
+    try {
+      if (existingTask == null) {
+        await DatabaseHelper.instance.insertTask(taskToSave);
+      } else {
+        await DatabaseHelper.instance.updateTask(taskToSave);
       }
 
-      final existingTask = widget.task;
+      if (!mounted) return;
 
-      final taskToReturn = existingTask == null
-          ? Task(
-              id: DateTime.now().microsecondsSinceEpoch.toString(),
-              title: _titleController.text.trim(),
-              description: _descriptionController.text.trim(),
-              assigneeId: selectedMember!.id,
-              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
-              deadline: _selectedDate!,
-              status: TaskStatus.todo,
-            )
-          : existingTask.copyWith(
-              title: _titleController.text.trim(),
-              description: _descriptionController.text.trim(),
-              assigneeId: selectedMember!.id,
-              priority: Priority.values.byName(selectedPriority!.toLowerCase()),
-              deadline: _selectedDate!,
-            );
+      Navigator.pop(context, taskToSave);
+    } catch (e) {
+      if (!mounted) return;
 
-      Navigator.pop(context, taskToReturn);
-    });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Could not save task: $e')));
+    }
   }
 }
