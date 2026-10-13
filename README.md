@@ -10,7 +10,8 @@ SLA status (onTrack, atRisk, overDue, completed) based on deadlines
 ## Flutter Screens
 <table align="center">
   <tr>
-    <td><img src="project_task_tracker/screenshots/sign_in_overview.png" width="100%"></td>
+    <td><img src="project_task_tracker/screenshots/sign_in_overview.png" width="100%"></td>    
+    <td><img src="project_task_tracker/screenshots/task_overview.png" width="100%"></td>
     <td><img src="project_task_tracker/screenshots/task_list.png" width="100%"></td>
     <td><img src="project_task_tracker/screenshots/task_details_2.png" width="100%"></td>
   </tr>
